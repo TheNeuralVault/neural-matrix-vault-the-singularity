@@ -1,10 +1,3 @@
----
-
-### /// ARTIFACT 2: THE APP DNA (`manifest.json`)
-*Directives: PWA Standards, Neon Branding, Standalone Execution.*
-*Note: Save this file exactly as `manifest.json` in your root folder.*
-
-```json
 {
   "name": "NEURAL MATRIX VAULT",
   "short_name": "NMV",
