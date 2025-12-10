@@ -1,54 +1,90 @@
-console.log("/// NEURAL MATRIX: ONLINE");
+console.log("%c/// NEURAL MATRIX VAULT: ONLINE ///", "color:#00f3ff; background:#000; padding:5px; border:1px solid #00f3ff;");
 
-// Simple Interaction Sound
-const playSound = () => {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    
-    osc.frequency.setValueAtTime(400, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.1);
-    
-    gain.gain.setValueAtTime(0.1, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
-    
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.1);
-};
+const isMobile = window.innerWidth <= 768;
 
-// Bind to Buttons
-document.querySelectorAll('a, button').forEach(el => {
-    el.addEventListener('click', playSound);
-});
+// 1. MULTI-COLOR MATRIX RAIN (Blue > Green > White > Grey > Red)
+const mCanvas = document.getElementById('matrix-rain');
+if (mCanvas) {
+    const mCtx = mCanvas.getContext('2d');
+    mCanvas.width = window.innerWidth;
+    mCanvas.height = window.innerHeight;
 
-// Canvas Background (Lightweight)
-const canvas = document.getElementById('neural-engine');
-if(canvas) {
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    const chars = "01XYZA".split("");
+    const fontSize = 14;
+    const columns = mCanvas.width / fontSize;
+    const drops = Array(Math.floor(columns)).fill(1);
     
-    const particles = Array(50).fill().map(() => ({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5
-    }));
+    // REQUESTED ORDER: Blue, Green, White, Grey, Red
+    const palette = [
+        {r:0,g:243,b:255},   // Blue
+        {r:0,g:255,b:0},     // Green
+        {r:255,g:255,b:255}, // White
+        {r:128,g:128,b:128}, // Grey
+        {r:255,g:0,b:0}      // Red
+    ];
+    let time = 0;
 
-    function animate() {
-        ctx.fillStyle = 'rgba(0,0,0,0.1)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    function drawMatrix() {
+        mCtx.fillStyle = "rgba(0, 0, 0, 0.05)";
+        mCtx.fillRect(0, 0, mCanvas.width, mCanvas.height);
         
-        ctx.fillStyle = '#00f3ff';
-        particles.forEach(p => {
-            p.x += p.vx; p.y += p.vy;
-            if(p.x < 0 || p.x > canvas.width) p.vx *= -1;
-            if(p.y < 0 || p.y > canvas.height) p.vy *= -1;
-            ctx.fillRect(p.x, p.y, 2, 2);
-        });
-        requestAnimationFrame(animate);
+        time += 0.005;
+        const colorIdx = Math.floor(time) % palette.length;
+        const c = palette[colorIdx];
+        
+        mCtx.fillStyle = `rgb(${c.r},${c.g},${c.b})`;
+        mCtx.font = fontSize + "px monospace";
+
+        for (let i = 0; i < drops.length; i++) {
+            const text = chars[Math.floor(Math.random() * chars.length)];
+            mCtx.fillText(text, i * fontSize, drops[i] * fontSize);
+            if (drops[i] * fontSize > mCanvas.height && Math.random() > 0.975) {
+                drops[i] = 0;
+            }
+            drops[i]++;
+        }
+        requestAnimationFrame(drawMatrix);
     }
-    animate();
+    drawMatrix();
 }
+
+// 2. THE 3D ARTIFACT
+const artifactContainer = document.getElementById('singularity-vessel');
+if (artifactContainer) {
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(50, artifactContainer.clientWidth / artifactContainer.clientHeight, 0.1, 100);
+    camera.position.z = 6;
+
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: !isMobile });
+    renderer.setSize(artifactContainer.clientWidth, artifactContainer.clientHeight);
+    artifactContainer.appendChild(renderer.domElement);
+
+    const geometry = new THREE.IcosahedronGeometry(1.5, 0);
+    const material = new THREE.MeshPhongMaterial({ color: 0x000000, emissive: 0x111111, flatShading: true, shininess: 100 });
+    const core = new THREE.Mesh(geometry, material);
+    scene.add(core);
+
+    const wireGeo = new THREE.IcosahedronGeometry(1.6, 1);
+    const wireMat = new THREE.MeshBasicMaterial({ color: 0x00f3ff, wireframe: true, transparent: true, opacity: 0.3 });
+    const cage = new THREE.Mesh(wireGeo, wireMat);
+    scene.add(cage);
+
+    const l1 = new THREE.PointLight(0x00f3ff, 2, 10); l1.position.set(3, 2, 3); scene.add(l1);
+    const l2 = new THREE.PointLight(0xff0055, 2, 10); l2.position.set(-3, -2, 3); scene.add(l2);
+
+    function animateArtifact() {
+        requestAnimationFrame(animateArtifact);
+        core.rotation.y += 0.004; core.rotation.x -= 0.002;
+        cage.rotation.y -= 0.002;
+        renderer.render(scene, camera);
+    }
+    animateArtifact();
+}
+
+// 3. INIT & ICONS
+try {
+    lucide.createIcons();
+    const lenis = new Lenis({ duration: 1.2, smooth: true });
+    function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+    requestAnimationFrame(raf);
+} catch(e) {}
