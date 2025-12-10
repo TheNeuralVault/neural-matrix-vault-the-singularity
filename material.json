@@ -1,12 +1,11 @@
 {
   "name": "NEURAL MATRIX VAULT",
   "short_name": "NMV",
-  "start_url": "/",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#030303",
   "theme_color": "#00f3ff",
   "orientation": "portrait-primary",
-  "description": "The Singularity. State of the Art Digital Architecture.",
   "icons": [
     {
       "src": "https://img.icons8.com/fluency/192/processor.png",
