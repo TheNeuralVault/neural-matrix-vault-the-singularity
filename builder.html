@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEURAL CONSTRUCTOR | v1.0</title>
+    <link rel="stylesheet" href="builder.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;500;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="interface-wrapper">
+    <aside class="sidebar-left">
+        <div class="brand">NMV<span class="highlight">_BUILDER</span></div>
+        <div class="tab-triggers">
+            <button class="tab-btn active" onclick="switchLeftTab('tools')"><i data-lucide="layout-template"></i> ELEMENTS</button>
+            <button class="tab-btn" onclick="switchLeftTab('pages')"><i data-lucide="files"></i> PAGES</button>
+        </div>
+        <div id="panel-tools" class="left-panel active">
+            <div class="tool-label">INTERFACE COMPONENTS</div>
+            <div class="draggable-item" draggable="true" data-type="header"><i data-lucide="layout-panel-top"></i> NAV_HEADER</div>
+            <div class="draggable-item" draggable="true" data-type="hero"><i data-lucide="monitor"></i> HERO_SECTION</div>
+            <div class="draggable-item" draggable="true" data-type="text-block"><i data-lucide="type"></i> TEXT_BLOCK</div>
+            <div class="draggable-item" draggable="true" data-type="image"><i data-lucide="image"></i> MEDIA_VESSEL</div>
+            <div class="draggable-item" draggable="true" data-type="button"><i data-lucide="mouse-pointer-2"></i> ACTION_BUTTON</div>
+            <div class="draggable-item" draggable="true" data-type="video"><i data-lucide="video"></i> VIDEO_STREAM</div>
+        </div>
+        <div id="panel-pages" class="left-panel">
+            <div class="page-list" id="page-manager">
+                <div class="page-item active" onclick="loadPage('home')"><i data-lucide="home"></i> HOME (index)</div>
+                <div class="page-item" onclick="loadPage('about')"><i data-lucide="file"></i> ABOUT</div>
+                <div class="page-item" onclick="loadPage('services')"><i data-lucide="briefcase"></i> SERVICES</div>
+                <div class="page-item" onclick="loadPage('contact')"><i data-lucide="mail"></i> CONTACT</div>
+            </div>
+        </div>
+    </aside>
+    <main class="canvas-area">
+        <div class="canvas-header">
+            <div class="current-view">EDITING: <span id="current-page-label" class="highlight">HOME</span></div>
+            <div class="device-toggles">
+                <button class="device-btn active"><i data-lucide="monitor"></i></button>
+                <button class="device-btn"><i data-lucide="smartphone"></i></button>
+            </div>
+            <button class="btn-preview" onclick="togglePreview()">PREVIEW_MODE</button>
+        </div>
+        <div id="workspace" class="drop-zone"><div class="placeholder-msg">/// DRAG COMPONENTS HERE TO INITIALIZE ///</div></div>
+    </main>
+    <aside class="sidebar-right">
+        <div class="action-bar">
+            <button class="sys-btn" onclick="openAnalytics()"><i data-lucide="bar-chart-2"></i></button>
+            <button class="sys-btn" onclick="openSettings()"><i data-lucide="settings"></i></button>
+            <button class="sys-btn primary" onclick="exportSite()">DEPLOY</button>
+        </div>
+        <div id="properties-panel" class="properties-panel">
+            <div class="panel-header">COMPONENT_ATTRIBUTES</div>
+            <div id="no-selection" class="info-msg">SELECT AN ELEMENT TO EDIT</div>
+            <div id="editor-controls" style="display:none;">
+                <div class="control-group"><label>CONTENT TEXT</label><input type="text" id="prop-text" class="input-titanium"></div>
+                <div class="control-group"><label>BACKGROUND (HEX)</label><div class="color-wrapper"><input type="color" id="prop-color"><span id="hex-val">#000000</span></div></div>
+                <button class="btn-delete" onclick="deleteSelected()">DELETE_ARTIFACT</button>
+            </div>
+        </div>
+    </aside>
+</div>
+<div id="modal-analytics" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-header"><h3>REAL-TIME_ANALYTICS</h3><button onclick="closeModal('modal-analytics')">X</button></div>
+        <div class="chart-container"><canvas id="trafficChart"></canvas></div>
+        <div class="stats-row">
+            <div class="stat-box"><span>VISITORS</span><strong>12.4K</strong></div>
+            <div class="stat-box highlight"><span>REVENUE</span><strong>$84K</strong></div>
+        </div>
+    </div>
+</div>
+<div id="modal-settings" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-header"><h3>DOMAIN_CONTROLLER</h3><button onclick="closeModal('modal-settings')">X</button></div>
+        <div class="settings-form">
+            <label>PRIMARY DOMAIN</label><input type="text" value="neuralmatrixvault.com" class="input-titanium" readonly>
+            <button class="btn-save">UPDATE_DNS_RECORDS</button>
+        </div>
+    </div>
+</div>
+<script src="builder.min.js"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>
