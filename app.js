@@ -114,3 +114,55 @@ try {
     function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
     requestAnimationFrame(raf);
 } catch(e) {}
+// /// 4. AUDIO INTERFACE PROTOCOL ///
+const AudioEngine = {
+    ctx: new (window.AudioContext || window.webkitAudioContext)(),
+    
+    // Generate a sci-fi "blip" on hover
+    hoverTone: function() {
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, this.ctx.currentTime + 0.1);
+        
+        gain.gain.setValueAtTime(0.05, this.ctx.currentTime); // Low volume
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.1);
+        
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.1);
+    },
+
+    // Generate a "lock-in" sound on click
+    clickTone: function() {
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(220, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(55, this.ctx.currentTime + 0.3);
+        
+        gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.3);
+        
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.3);
+    }
+};
+
+// ATTACH TO DOM
+document.addEventListener('DOMContentLoaded', () => {
+    const interactables = document.querySelectorAll('a, button, .cell');
+    
+    interactables.forEach(el => {
+        el.addEventListener('mouseenter', () => AudioEngine.hoverTone());
+        el.addEventListener('click', () => AudioEngine.clickTone());
+    });
+});
