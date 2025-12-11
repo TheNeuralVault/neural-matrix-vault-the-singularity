@@ -2,75 +2,140 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEURAL CONSTRUCTOR | v1.0</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NEURAL CONSTRUCTOR | v2.0</title>
     <link rel="stylesheet" href="builder.css">
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;500;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+
+<!-- HIDDEN UPLOAD INPUT -->
+<input type="file" id="global-upload" hidden accept="image/*,video/*">
+
 <div class="interface-wrapper">
-    <aside class="sidebar-left">
-        <div class="brand">NMV<span class="highlight">_BUILDER</span></div>
+    
+    <!-- MOBILE HEADER -->
+    <div class="mobile-nav">
+        <button onclick="toggleSidebar('left')"><i data-lucide="menu"></i> TOOLS</button>
+        <div class="brand-mobile">NMV_BUILDER</div>
+        <button onclick="toggleSidebar('right')"><i data-lucide="settings-2"></i> EDIT</button>
+    </div>
+
+    <!-- LEFT: TOOLBOX -->
+    <aside class="sidebar-left" id="sidebar-left">
+        <div class="brand">NMV<span class="highlight">_ARCHITECT</span></div>
+        
         <div class="tab-triggers">
             <button class="tab-btn active" onclick="switchLeftTab('tools')"><i data-lucide="layout-template"></i> ELEMENTS</button>
             <button class="tab-btn" onclick="switchLeftTab('pages')"><i data-lucide="files"></i> PAGES</button>
         </div>
+
+        <!-- PANEL: TOOLS -->
         <div id="panel-tools" class="left-panel active">
-            <div class="tool-label">INTERFACE COMPONENTS</div>
-            <div class="draggable-item" draggable="true" data-type="header"><i data-lucide="layout-panel-top"></i> NAV_HEADER</div>
-            <div class="draggable-item" draggable="true" data-type="hero"><i data-lucide="monitor"></i> HERO_SECTION</div>
-            <div class="draggable-item" draggable="true" data-type="text-block"><i data-lucide="type"></i> TEXT_BLOCK</div>
-            <div class="draggable-item" draggable="true" data-type="image"><i data-lucide="image"></i> MEDIA_VESSEL</div>
-            <div class="draggable-item" draggable="true" data-type="button"><i data-lucide="mouse-pointer-2"></i> ACTION_BUTTON</div>
-            <div class="draggable-item" draggable="true" data-type="video"><i data-lucide="video"></i> VIDEO_STREAM</div>
+            
+            <div class="tool-category">NAVIGATION</div>
+            <div class="draggable-item" draggable="true" data-type="header-minimal"><i data-lucide="minus"></i> HEADER_MINIMAL</div>
+            <div class="draggable-item" draggable="true" data-type="header-cyber"><i data-lucide="cpu"></i> HEADER_CYBER</div>
+
+            <div class="tool-category">HERO SECTIONS</div>
+            <div class="draggable-item" draggable="true" data-type="hero-clean"><i data-lucide="monitor"></i> HERO_CLEAN</div>
+            <div class="draggable-item" draggable="true" data-type="hero-matrix"><i data-lucide="code"></i> HERO_MATRIX</div>
+
+            <div class="tool-category">CONTENT BLOCKS</div>
+            <div class="draggable-item" draggable="true" data-type="text-split"><i data-lucide="columns"></i> TEXT_SPLIT</div>
+            <div class="draggable-item" draggable="true" data-type="features-grid"><i data-lucide="grid"></i> FEATURE_GRID</div>
+            
+            <div class="tool-category">MEDIA & ACTION</div>
+            <div class="draggable-item" draggable="true" data-type="image"><i data-lucide="image"></i> IMAGE_VESSEL</div>
+            <div class="draggable-item" draggable="true" data-type="video"><i data-lucide="video"></i> VIDEO_EMBED</div>
+            <div class="draggable-item" draggable="true" data-type="button-primary"><i data-lucide="mouse-pointer-2"></i> BTN_PRIMARY</div>
+            <div class="draggable-item" draggable="true" data-type="button-neon"><i data-lucide="zap"></i> BTN_NEON</div>
         </div>
+
+        <!-- PANEL: PAGES -->
         <div id="panel-pages" class="left-panel">
             <div class="page-list" id="page-manager">
-                <div class="page-item active" onclick="loadPage('home')"><i data-lucide="home"></i> HOME (index)</div>
+                <div class="page-item active" onclick="loadPage('home')"><i data-lucide="home"></i> HOME</div>
                 <div class="page-item" onclick="loadPage('about')"><i data-lucide="file"></i> ABOUT</div>
                 <div class="page-item" onclick="loadPage('services')"><i data-lucide="briefcase"></i> SERVICES</div>
                 <div class="page-item" onclick="loadPage('contact')"><i data-lucide="mail"></i> CONTACT</div>
+                <button class="btn-add-page">+ ADD PAGE</button>
             </div>
         </div>
     </aside>
+
+    <!-- CENTER: CANVAS -->
     <main class="canvas-area">
         <div class="canvas-header">
-            <div class="current-view">EDITING: <span id="current-page-label" class="highlight">HOME</span></div>
+            <div class="current-view">PAGE: <span id="current-page-label" class="highlight">HOME</span></div>
             <div class="device-toggles">
-                <button class="device-btn active"><i data-lucide="monitor"></i></button>
-                <button class="device-btn"><i data-lucide="smartphone"></i></button>
+                <button class="device-btn active" onclick="setDevice('desktop')"><i data-lucide="monitor"></i></button>
+                <button class="device-btn" onclick="setDevice('mobile')"><i data-lucide="smartphone"></i></button>
             </div>
-            <button class="btn-preview" onclick="togglePreview()">PREVIEW_MODE</button>
+            <button class="btn-preview" onclick="togglePreview()">PREVIEW</button>
         </div>
-        <div id="workspace" class="drop-zone"><div class="placeholder-msg">/// DRAG COMPONENTS HERE TO INITIALIZE ///</div></div>
+        
+        <!-- DROP ZONE -->
+        <div id="workspace-container">
+            <div id="workspace" class="drop-zone desktop-view">
+                <div class="placeholder-msg">/// INITIATE ARCHITECTURE HERE ///</div>
+            </div>
+        </div>
     </main>
-    <aside class="sidebar-right">
+
+    <!-- RIGHT: PROPERTIES -->
+    <aside class="sidebar-right" id="sidebar-right">
         <div class="action-bar">
             <button class="sys-btn" onclick="openAnalytics()"><i data-lucide="bar-chart-2"></i></button>
             <button class="sys-btn" onclick="openSettings()"><i data-lucide="settings"></i></button>
             <button class="sys-btn primary" onclick="exportSite()">DEPLOY</button>
         </div>
+
         <div id="properties-panel" class="properties-panel">
-            <div class="panel-header">COMPONENT_ATTRIBUTES</div>
-            <div id="no-selection" class="info-msg">SELECT AN ELEMENT TO EDIT</div>
+            <div class="panel-header">ATTRIBUTES_MATRIX</div>
+            
+            <div id="no-selection" class="info-msg">SELECT ARTIFACT TO MODIFY</div>
+
             <div id="editor-controls" style="display:none;">
-                <div class="control-group"><label>CONTENT TEXT</label><input type="text" id="prop-text" class="input-titanium"></div>
-                <div class="control-group"><label>BACKGROUND (HEX)</label><div class="color-wrapper"><input type="color" id="prop-color"><span id="hex-val">#000000</span></div></div>
-                <button class="btn-delete" onclick="deleteSelected()">DELETE_ARTIFACT</button>
+                <!-- DYNAMICALLY FILLED CONTROLS -->
+                <div class="control-group" id="ctrl-text">
+                    <label>CONTENT STRING</label>
+                    <textarea id="prop-text" class="input-titanium" rows="3"></textarea>
+                </div>
+                
+                <div class="control-group" id="ctrl-upload" style="display:none;">
+                    <label>MEDIA SOURCE</label>
+                    <button class="btn-upload" onclick="triggerUpload()">UPLOAD FILE <i data-lucide="upload"></i></button>
+                    <input type="text" id="prop-src" class="input-titanium" placeholder="OR PASTE URL">
+                </div>
+
+                <div class="control-group">
+                    <label>BACKGROUND FREQUENCY</label>
+                    <div class="color-wrapper">
+                        <input type="color" id="prop-color">
+                        <span id="hex-val">#000000</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>PADDING (Y-AXIS)</label>
+                    <input type="range" id="prop-padding" min="0" max="200" value="50">
+                </div>
+
+                <button class="btn-delete" onclick="deleteSelected()">INCINERATE</button>
             </div>
         </div>
     </aside>
+
 </div>
+
+<!-- MODALS (SAME AS BEFORE) -->
 <div id="modal-analytics" class="modal-overlay">
     <div class="modal-box">
         <div class="modal-header"><h3>REAL-TIME_ANALYTICS</h3><button onclick="closeModal('modal-analytics')">X</button></div>
         <div class="chart-container"><canvas id="trafficChart"></canvas></div>
-        <div class="stats-row">
-            <div class="stat-box"><span>VISITORS</span><strong>12.4K</strong></div>
-            <div class="stat-box highlight"><span>REVENUE</span><strong>$84K</strong></div>
-        </div>
     </div>
 </div>
 <div id="modal-settings" class="modal-overlay">
@@ -82,9 +147,10 @@
         </div>
     </div>
 </div>
-<script src="builder.min.js"></script>
+
+<script src="builder.js"></script>
 <script>lucide.createIcons();</script>
-<!-- /// SECURITY LAYER /// -->
+<!-- SECURITY -->
 <script src="defense.js"></script>
 </body>
 </html>
