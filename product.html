@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARCHITECTURAL BRIEFING | NMV</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;500;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        body { background: #020202; display: flex; flex-direction: column; min-height: 100vh; }
+        
+        .briefing-container { 
+            max-width: 800px; margin: 100px auto; padding: 40px; 
+            border: 1px solid #333; background: rgba(10,10,10,0.8); 
+            backdrop-filter: blur(10px); position: relative;
+        }
+        
+        .status-line { color: #666; font-family: 'Space Mono'; font-size: 0.8rem; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        
+        h1 { font-size: 3rem; margin: 0 0 20px 0; line-height: 1; text-transform: uppercase; }
+        
+        .mission-box, .tech-box { margin-bottom: 40px; }
+        .label { color: #00f3ff; font-family: 'Space Mono'; font-size: 0.9rem; margin-bottom: 10px; display: block; }
+        p { color: #ccc; line-height: 1.6; font-size: 1rem; margin-top: 0; }
+        
+        .action-area { display: flex; gap: 20px; margin-top: 50px; border-top: 1px solid #333; padding-top: 30px; }
+        
+        .btn-launch { 
+            flex: 1; background: #00f3ff; color: #000; text-align: center; padding: 20px; 
+            font-weight: bold; font-family: 'Space Mono'; text-decoration: none; 
+            transition: 0.3s; font-size: 1.1rem;
+        }
+        .btn-launch:hover { box-shadow: 0 0 30px rgba(0, 243, 255, 0.4); transform: translateY(-2px); }
+        
+        .btn-back { 
+            background: transparent; border: 1px solid #333; color: #666; padding: 20px; 
+            font-family: 'Space Mono'; text-decoration: none; transition: 0.3s;
+        }
+        .btn-back:hover { border-color: #fff; color: #fff; }
+
+        @media(max-width: 768px) {
+            .briefing-container { margin: 60px 20px; padding: 20px; }
+            h1 { font-size: 2rem; }
+            .action-area { flex-direction: column-reverse; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- /// HEADER /// -->
+    <header class="hud-header">
+        <div class="brand">NEURAL<span class="pulse">_MATRIX</span></div>
+        <a href="index.html" class="nav-item">RETURN</a>
+    </header>
+
+    <!-- /// CONTENT INJECTED BY JS /// -->
+    <div class="briefing-container" id="briefing-ui">
+        <div class="status-line">/// ACCESSING CLASSIFIED SPECS...</div>
+    </div>
+
+    <script>
+        // DATABASE OF SPECS
+        const CATALOG = {
+            'core': {
+                title: "THE NEURAL CORE",
+                mission: "Complete digital transformation. We replace standard sites with high-speed, futuristic platforms. Loads instantly on any device with cinema-grade 3D visuals. Architected to dominate Google results.",
+                tech: "• <strong>Engine:</strong> Custom WebGL & Three.js hardware acceleration.<br>• <strong>Host:</strong> High-Frequency Edge CDN (<100ms latency).<br>• <strong>SEO:</strong> AI-Structured Semantic Schema & JSON-LD.<br>• <strong>Security:</strong> Enterprise SSL & DDoS Mitigation."
+            },
+            'flux': {
+                title: "FLUX VELOCITY",
+                mission: "High-speed retail architecture. Kinetic, moving landing pages designed to capture attention and sell immediately. Instant load times maximize conversion rates with motion graphics that keep users engaged.",
+                tech: "• <strong>Engine:</strong> Lightweight Single Page Application (SPA).<br>• <strong>Motion:</strong> GSAP High-Performance Animation (60fps).<br>• <strong>Assets:</strong> WebP Next-Gen Compression.<br>• <strong>UI:</strong> Fluid Reactive Grid System."
+            },
+            'aero': {
+                title: "AERO PROTOCOL",
+                mission: "Corporate precision. Clean, 'Swiss-style' digital headquarters that project absolute stability. Minimalist design that organizes complex data perfectly and signals authority to high-value partners.",
+                tech: "• <strong>Structure:</strong> Asymmetrical CSS Grid Architecture.<br>• <strong>Type:</strong> Variable Font Rendering & Optical Sizing.<br>• <strong>Core:</strong> Static Site Generation (SSG) for 100% uptime.<br>• <strong>Standards:</strong> WCAG 2.1 AA Accessibility."
+            },
+            'nexus': {
+                title: "NEXUS STREAM",
+                mission: "Deploy your Mobile Command Center. The Nexus Stream is a sovereign dashboard architecture designed for absolute creator control. Features mobile-first logic, high-speed link aggregation, and a zero-latency interface.",
+                tech: "• <strong>Core:</strong> PWA (Progressive Web App) Framework.<br>• <strong>Sync:</strong> Real-time API Aggregation.<br>• <strong>Mobile:</strong> Touch-Optimized Physics Engine."
+            },
+            'cipher': {
+                title: "CIPHER PROTOCOL",
+                mission: "The Granite Wealth Architecture. Fortress-grade environment engineered for FinTech and Web3 ventures. Features military-grade encryption visualization, immutable ledger aesthetics, and absolute trust-based design patterns.",
+                tech: "• <strong>Security:</strong> AES-256 Encryption Visualization.<br>• <strong>Data:</strong> Real-time Ticker & API Integration.<br>• <strong>Compliance:</strong> GDPR & SOC2 Ready Framework."
+            },
+            'prism': {
+                title: "PRISM SaaS",
+                mission: "Liquid Intelligence made manifest. The apex UI/UX framework for AI dashboards and complex software platforms. Includes adaptive data visualization, neurological user flows, and a seamless glass-morphic interface.",
+                tech: "• <strong>Framework:</strong> React/Vue Hybrid Architecture.<br>• <strong>Data:</strong> D3.js & WebGL Visualization.<br>• <strong>UX:</strong> Adaptive Dark/Light Mode & Focus States."
+            },
+            'omega': {
+                title: "OMEGA REALITY",
+                mission: "Beyond the Screen. Omega Reality is the Singularity of web architecture. A fully immersive Spatial Computing environment featuring high-fidelity WebGL rendering, VR-ready infrastructure, and volumetric design.",
+                tech: "• <strong>Core:</strong> Three.js & WebXR Integration.<br>• <strong>Render:</strong> Ray-Tracing Simulation.<br>• <strong>Input:</strong> Spatial Hand Tracking & Gaze Detection."
+            }
+        };
+
+        // PARSE URL PARAMETERS
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id') || 'core'; // Default to core
+        const data = CATALOG[id];
+
+        // RENDER UI
+        const ui = document.getElementById('briefing-ui');
+        ui.innerHTML = `
+            <div class="status-line">/// SECURE CONNECTION ESTABLISHED: ${id.toUpperCase()}</div>
+            
+            <h1>${data.title}</h1>
+            
+            <div class="mission-box">
+                <span class="label">/// THE MISSION</span>
+                <p>${data.mission}</p>
+            </div>
+
+            <div class="tech-box">
+                <span class="label">/// THE TECH</span>
+                <p>${data.tech}</p>
+            </div>
+
+            <div class="action-area">
+                <a href="index.html" class="btn-back">ABORT</a>
+                <a href="builder.html" class="btn-launch">
+                    LAUNCH CONSTRUCTOR <i data-lucide="arrow-right"></i>
+                </a>
+            </div>
+        `;
+        
+        lucide.createIcons();
+    </script>
+</body>
+</html>
