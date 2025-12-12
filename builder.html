@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEURAL CONSTRUCTOR | v9.0</title>
+    <title>NEURAL CONSTRUCTOR | v10.0</title>
     
     <!-- /// GOOGLE TAG /// -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-P1PCVNCCE4"></script>
@@ -31,7 +31,7 @@
             --font-mono: 'Space Mono', monospace;
         }
 
-        body { margin: 0; background: var(--bg-void); color: #fff; font-family: var(--font-head); overflow: hidden; touch-action: none; /* Prevents scroll bounce */ }
+        body { margin: 0; background: var(--bg-void); color: #fff; font-family: var(--font-head); overflow: hidden; touch-action: none; }
         * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
 
         /* SCROLLBARS */
@@ -39,13 +39,22 @@
         ::-webkit-scrollbar-track { background: #000; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 
-        .interface-wrapper { display: flex; height: 100vh; width: 100%; position: relative; }
+        .interface-wrapper { display: flex; height: 100vh; width: 100%; position: relative; transition: 0.3s; }
+
+        /* MOBILE NAV */
+        .mobile-nav { 
+            display: none; height: 60px; background: #000; border-bottom: 1px solid var(--border);
+            justify-content: space-between; align-items: center; padding: 0 20px;
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 6000;
+        }
+        .mobile-nav button { background: none; border: none; color: #fff; display: flex; gap: 5px; align-items: center; cursor: pointer; }
+        .brand-mobile { font-family: var(--font-mono); color: var(--accent); font-weight: bold; letter-spacing: 2px; }
 
         /* SIDEBARS */
         .sidebar-left, .sidebar-right { 
             width: 320px; background: var(--bg-panel); border-right: 1px solid var(--border); 
-            display: flex; flex-direction: column; z-index: 5000; /* HIGH Z-INDEX */
-            backdrop-filter: blur(10px);
+            display: flex; flex-direction: column; z-index: 5000; 
+            backdrop-filter: blur(10px); transition: transform 0.3s ease;
         }
         .sidebar-right { border-left: 1px solid var(--border); border-right: none; }
 
@@ -96,6 +105,8 @@
         .element:hover { outline: 1px dashed rgba(0,243,255,0.3); cursor: grab; }
         .element.selected { outline: 2px solid var(--accent); z-index: 1000 !important; cursor: grabbing; }
         .element img, .element video { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+        /* Link styles inside elements */
+        .element a { color: inherit; text-decoration: none; pointer-events: none; /* Disabled in builder, active in preview */ }
 
         /* PROPERTIES */
         .properties-panel { padding: 25px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
@@ -103,7 +114,7 @@
         .btn-upload { width: 100%; background: #222; border: 1px dashed #666; color: #fff; padding: 15px; cursor: pointer; margin-bottom: 10px; display: flex; justify-content: center; gap: 10px; font-family: var(--font-mono); font-size: 0.75rem; transition: 0.2s; }
 
         /* RESIZERS */
-        .resizer { position: absolute; width: 30px; height: 30px; background: var(--accent); z-index: 1001; display: none; border: 2px solid #000; border-radius: 50%; /* Larger handle for mobile */ }
+        .resizer { position: absolute; width: 30px; height: 30px; background: var(--accent); z-index: 1001; display: none; border: 2px solid #000; border-radius: 50%; }
         .element.selected .resizer { display: block; }
         .resizer.se { bottom: -15px; right: -15px; cursor: se-resize; }
 
@@ -112,8 +123,8 @@
         .sys-btn.primary { background: var(--accent); color: #000; border: none; font-weight: bold; }
         
         /* MODALS */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; display: none; justify-content: center; align-items: center; }
-        .modal-box { width: 95%; max-width: 1000px; height: 80vh; background: #050505; border: 1px solid var(--border); display: flex; overflow: hidden; box-shadow: 0 0 50px rgba(0,243,255,0.1); }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2147483647; display: none; justify-content: center; align-items: center; }
+        .modal-box { width: 95%; max-width: 1000px; height: 80vh; background: #050505; border: 1px solid var(--border); display: flex; overflow: hidden; box-shadow: 0 0 50px rgba(0,243,255,0.1); position: relative; }
         .modal-sidebar { width: 300px; background: #0a0a0a; border-right: 1px solid var(--border); padding: 20px; overflow-y: auto; }
         .arch-btn { width: 100%; padding: 15px; text-align: left; background: #111; border: 1px solid #333; color: #888; margin-bottom: 10px; cursor: pointer; font-family: 'Space Mono'; transition: 0.3s; }
         .arch-btn:hover { border-color: var(--accent); color: #fff; }
@@ -127,14 +138,25 @@
         .spec-text { color: #ccc; font-size: 0.9rem; line-height: 1.6; }
         .spec-actions { margin-top: 40px; }
 
-        /* MOBILE NAV */
-        .mobile-nav { 
-            display: none; height: 60px; background: #000; border-bottom: 1px solid var(--border);
-            justify-content: space-between; align-items: center; padding: 0 20px;
-            position: fixed; top: 0; left: 0; width: 100%; z-index: 6000; /* SUPER HIGH Z */
+        /* PREVIEW MODE EXIT BUTTON */
+        #exit-preview-btn {
+            position: fixed; bottom: 30px; right: 30px; z-index: 2147483647;
+            background: #ff0055; color: #fff; border: none; padding: 15px 30px;
+            font-weight: bold; font-family: 'Space Mono'; display: none; cursor: pointer;
+            box-shadow: 0 0 20px rgba(255,0,85,0.5);
         }
-        .mobile-nav button { background: none; border: none; color: #fff; display: flex; gap: 5px; align-items: center; cursor: pointer; }
-        .brand-mobile { font-family: var(--font-mono); color: var(--accent); font-weight: bold; letter-spacing: 2px; }
+
+        /* PREVIEW MODE STATES */
+        body.preview-active .sidebar-left, 
+        body.preview-active .sidebar-right, 
+        body.preview-active .mobile-nav, 
+        body.preview-active .canvas-header { display: none !important; }
+        
+        body.preview-active .element { outline: none !important; }
+        body.preview-active .resizer { display: none !important; }
+        body.preview-active .element a { pointer-events: auto !important; /* ENABLE LINKS IN PREVIEW */ }
+        body.preview-active #exit-preview-btn { display: block; }
+        body.preview-active #workspace { width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; background: #000; z-index: 9999; }
 
         @media(max-width: 768px) { 
             .interface-wrapper { flex-direction: column; padding-top: 60px; } 
@@ -156,6 +178,9 @@
 
 <!-- UPLOAD CONDUIT -->
 <input type="file" id="media-upload-input" hidden accept="image/*,video/*" multiple>
+
+<!-- EXIT PREVIEW BUTTON -->
+<button id="exit-preview-btn" onclick="togglePreview()">EXIT PREVIEW</button>
 
 <div class="interface-wrapper">
     <!-- MOBILE NAV -->
@@ -185,7 +210,9 @@
     <main class="canvas-area">
         <div class="canvas-header">
             <div class="brand" style="border:none; padding:0;">WORKSPACE</div>
-            <button class="sys-btn" onclick="togglePreview()">PREVIEW</button>
+            <div style="display:flex; gap:10px;">
+                <button class="sys-btn" onclick="togglePreview()">PREVIEW</button>
+            </div>
         </div>
         <div id="workspace" class="drop-zone">
             <div class="placeholder-msg">/// CLICK TOOLS TO SPAWN ///</div>
@@ -196,6 +223,7 @@
     <aside class="sidebar-right" id="sidebar-right">
         <div style="padding:20px; border-bottom:1px solid #333;">
             <button class="sys-btn primary" onclick="deploySequence()" style="width:100%;">DEPLOY SITE</button>
+            <button class="sys-btn" onclick="openAnalytics()" style="width:100%; margin-top:10px;">ANALYTICS</button>
         </div>
         <div id="properties-panel" class="properties-panel">
             <div class="tool-category">ATTRIBUTES</div>
@@ -203,20 +231,35 @@
             <div id="editor-controls" style="display:none;">
                 <label class="tool-category">CONTENT</label>
                 <textarea id="prop-text" class="input-titanium" rows="3"></textarea>
+                
+                <label class="tool-category" style="margin-top:20px;">LINK URL (HTTPS://...)</label>
+                <input type="text" id="prop-link" class="input-titanium" placeholder="Enter link...">
+
                 <label class="tool-category" style="margin-top:20px;">BACKGROUND</label>
                 <input type="color" id="prop-color" style="width:100%; height:40px; background:none; border:1px solid #333;">
+                
                 <label class="tool-category" style="margin-top:20px;">Z-INDEX</label>
                 <input type="number" id="prop-z" class="input-titanium" value="1">
+                
                 <button class="btn-upload" style="margin-top:30px; border-color:red; color:red;" onclick="deleteSelected()">INCINERATE</button>
             </div>
         </div>
     </aside>
 </div>
 
+<!-- /// ANALYTICS MODAL /// -->
+<div id="modal-analytics" class="modal-overlay">
+    <div class="modal-box" style="flex-direction:column; align-items:center; justify-content:center; max-width:600px; height:auto;">
+        <h3 style="font-family:'Space Mono'; margin-bottom:20px; color:#fff;">TRAFFIC_FLUX</h3>
+        <div class="chart-container" style="width:100%;"><canvas id="trafficChart"></canvas></div>
+        <button class="btn-upload" onclick="closeModal('modal-analytics')" style="margin-top:20px;">CLOSE</button>
+    </div>
+</div>
+
 <!-- /// INTELLIGENT PRODUCT SPECIFICATION MODAL /// -->
 <div id="payment-modal" class="modal-overlay">
     <div class="modal-box">
-        <button onclick="closePayment()" style="position:absolute; top:20px; right:20px; z-index:99; background:none; border:none; color:#666; font-size:1.5rem;">&times;</button>
+        <button onclick="closePayment()" style="position:absolute; top:20px; right:20px; z-index:99; background:none; border:none; color:#666; font-size:1.5rem; cursor:pointer;">&times;</button>
         
         <!-- SIDEBAR SELECTOR -->
         <div class="modal-sidebar">
@@ -231,11 +274,13 @@
         </div>
 
         <!-- SPEC SHEET -->
-        <div class="modal-content" id="spec-container"></div>
+        <div class="modal-content" id="spec-container">
+            <!-- DYNAMIC CONTENT INJECTED HERE BY JS -->
+        </div>
     </div>
 </div>
 
 <script src="builder.js"></script>
 <script>lucide.createIcons();</script>
 </body>
-                </html>
+</html>
