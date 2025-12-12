@@ -1,10 +1,10 @@
 /**
- * NEURAL CONSTRUCTOR v11.0 (RESTORED EDITION)
+ * NEURAL CONSTRUCTOR v12.0 (POINTER EVENTS PROTOCOL)
  * ARCHITECT: MAGNUS OPUS
- * PROTOCOLS: PAGES, POINTER EVENTS, DEPLOYMENT
+ * COMPATIBILITY: MOUSE, TOUCH, STYLUS (UNIVERSAL)
  */
 
-// /// 1. DATABASE ///
+// /// 1. DATABASE & STATE ///
 const PRODUCT_CATALOG = {
     core: { title: "THE NEURAL CORE", price: "$2,500.00", link: "https://buy.stripe.com/7sY7sL8dib6SbuvbPt8g001", mission: "Complete digital transformation...", tech: "Custom WebGL & Three.js..." },
     flux: { title: "FLUX VELOCITY", price: "$2,500.00", link: "https://buy.stripe.com/aFa3cv2SY3EqaqrcTx8g002", mission: "High-speed retail architecture...", tech: "Lightweight SPA & GSAP..." },
@@ -28,112 +28,159 @@ let pageStates = {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("%c/// NEURAL SYSTEM ONLINE ///", "color:#00f3ff; background:#000; padding:5px;");
+    console.log("%c/// NEURAL PHYSICS: POINTER EVENTS ACTIVE ///", "color:#00f3ff; background:#000; padding:5px;");
     
-    // Listeners
+    // Global Listeners
     const mediaInput = document.getElementById('media-upload-input');
     if(mediaInput) mediaInput.addEventListener('change', handleMediaUpload);
     
-    document.getElementById('prop-text').addEventListener('input', updateProps);
-    document.getElementById('prop-link').addEventListener('input', updateProps);
-    document.getElementById('prop-color').addEventListener('input', updateProps);
-    document.getElementById('prop-z').addEventListener('input', updateProps);
-    
-    const ws = document.getElementById('workspace');
-    if(ws) ws.addEventListener('pointerdown', (e) => { if(e.target.id === 'workspace') deselectAll(); });
+    // Property Panel Listeners
+    const pText = document.getElementById('prop-text');
+    const pLink = document.getElementById('prop-link');
+    const pColor = document.getElementById('prop-color');
+    const pZ = document.getElementById('prop-z');
 
-    // Initial Load
+    if(pText) pText.addEventListener('input', updateProps);
+    if(pLink) pLink.addEventListener('input', updateProps);
+    if(pColor) pColor.addEventListener('input', updateProps);
+    if(pZ) pZ.addEventListener('input', updateProps);
+    
+    // Global Deselect (Pointer Event)
+    const ws = document.getElementById('workspace');
+    if(ws) ws.addEventListener('pointerdown', (e) => { 
+        if(e.target.id === 'workspace') deselectAll(); 
+    });
+
+    // Init
     restorePageState('home');
     loadSpec('core');
     initAnalytics();
 });
 
-// /// 2. PAGE LOGIC (RESTORED) ///
+// /// 2. OMNI-PHYSICS ENGINE (THE CORE) ///
 
-window.switchPage = function(newPage) {
-    if (currentPage === newPage) return;
+function initPointerDrag(el) {
+    let isDragging = false;
+    let startX, startY, initialLeft, initialTop;
 
-    // 1. SAVE Current
-    const ws = document.getElementById('workspace');
-    pageStates[currentPage] = ws.innerHTML;
+    el.addEventListener('pointerdown', (e) => {
+        // Ignore if clicking the resizer handle
+        if(e.target.classList.contains('resizer')) return;
+        
+        // CRITICAL: Stop browser scrolling
+        e.preventDefault(); 
+        e.stopPropagation();
+        
+        // Select the element
+        selectComponent(el);
+        
+        // Capture the pointer (keeps dragging even if mouse leaves div)
+        el.setPointerCapture(e.pointerId);
+        
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        initialLeft = el.offsetLeft;
+        initialTop = el.offsetTop;
+        
+        el.style.cursor = 'grabbing';
+    });
 
-    // 2. UI Update
-    document.querySelectorAll('.page-item').forEach(p => p.classList.remove('active'));
-    event.currentTarget.classList.add('active');
-    document.getElementById('current-page-label').innerText = newPage.toUpperCase();
+    el.addEventListener('pointermove', (e) => {
+        if(!isDragging) return;
+        e.preventDefault(); // Stop scroll
+        
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        
+        el.style.left = `${initialLeft + dx}px`;
+        el.style.top = `${initialTop + dy}px`;
+    });
 
-    // 3. LOAD New
-    currentPage = newPage;
-    if (!pageStates[newPage] || pageStates[newPage].trim() === '') {
-        ws.innerHTML = '<div class="placeholder-msg">/// EMPTY SECTOR ///</div>';
-    } else {
-        ws.innerHTML = pageStates[newPage];
-    }
-
-    // 4. REBIND
-    rebindPhysics();
-    if(window.innerWidth <= 768) closeMobileSidebar();
-};
-
-function restorePageState(page) {
-    pageStates[page] = document.getElementById('workspace').innerHTML;
+    el.addEventListener('pointerup', (e) => {
+        if(!isDragging) return;
+        isDragging = false;
+        el.style.cursor = 'grab';
+        el.releasePointerCapture(e.pointerId);
+    });
 }
 
-function rebindPhysics() {
-    const elements = document.querySelectorAll('.element');
-    elements.forEach(el => {
-        el.onpointerdown = null; // Clear old
-        initPointerDrag(el); // Re-bind
-        el.addEventListener('pointerdown', (e) => {
-            if(!e.target.classList.contains('resizer')) { e.stopPropagation(); selectComponent(el); }
-        });
+function initPointerResize(el, resizer) {
+    let isResizing = false;
+    let startX, startY, startW, startH;
+
+    resizer.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        resizer.setPointerCapture(e.pointerId);
         
-        // Re-bind resizers
-        const r = el.querySelector('.resizer');
-        if(r) {
-            r.onpointerdown = null;
-            initPointerResize(el, r);
-        }
+        isResizing = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        startW = parseInt(document.defaultView.getComputedStyle(el).width, 10);
+        startH = parseInt(document.defaultView.getComputedStyle(el).height, 10);
+    });
+
+    resizer.addEventListener('pointermove', (e) => {
+        if(!isResizing) return;
+        e.preventDefault();
+        
+        const width = startW + (e.clientX - startX);
+        const height = startH + (e.clientY - startY);
+        
+        // Minimum size check
+        if(width > 20) el.style.width = `${width}px`;
+        if(height > 20) el.style.height = `${height}px`;
+    });
+
+    resizer.addEventListener('pointerup', (e) => {
+        isResizing = false;
+        resizer.releasePointerCapture(e.pointerId);
     });
 }
 
 // /// 3. SPAWN LOGIC ///
 
-window.triggerMediaUpload = function() { document.getElementById('media-upload-input').click(); };
-
-function handleMediaUpload(e) {
-    const files = Array.from(e.target.files);
-    if (!files.length) return;
-    files.forEach(file => {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-            const src = evt.target.result;
-            const type = file.type.startsWith('video/') ? 'video' : 'image';
-            uploadedMedia.push({ src, type });
-            renderThumbnail(src, type);
-        };
-        reader.readAsDataURL(file);
-    });
+function createBaseElement() {
+    const el = document.createElement('div');
+    el.className = 'element';
+    
+    // Spawn in visual center relative to scroll
+    // On mobile, this ensures it appears where they are looking
+    const ws = document.getElementById('workspace');
+    el.style.left = '50px'; 
+    el.style.top = '50px';
+    el.style.zIndex = zIndexCounter++;
+    
+    // CRITICAL: DISABLE BROWSER GESTURES ON THE ELEMENT
+    el.style.touchAction = "none"; 
+    
+    // Attach Physics
+    initPointerDrag(el);
+    
+    return el;
 }
 
-function renderThumbnail(src, type) {
-    const grid = document.getElementById('media-grid');
-    const thumb = document.createElement('div');
-    thumb.className = 'media-thumb';
-    if(type === 'video') {
-        thumb.innerHTML = '<i data-lucide="video" style="color:#fff;"></i>';
-        thumb.style.display = 'flex'; thumb.style.alignItems = 'center'; thumb.style.justifyContent = 'center';
-    } else {
-        thumb.style.backgroundImage = `url(${src})`;
-    }
-    thumb.onclick = (e) => { e.preventDefault(); spawnMedia(src, type); };
-    grid.insertBefore(thumb, grid.firstElementChild);
-    if(window.lucide) lucide.createIcons();
+function addToWorkspace(el) {
+    const ws = document.getElementById('workspace');
+    const ph = ws.querySelector('.placeholder-msg');
+    if(ph) ph.remove();
+    
+    // Inject Resizer
+    const r = document.createElement('div');
+    r.className = 'resizer se';
+    el.appendChild(r);
+    initPointerResize(el, r);
+
+    ws.appendChild(el);
+    selectComponent(el);
 }
 
+// Spawners
 window.spawnMedia = function(src, type) {
     const el = createBaseElement();
     if(type === 'video') {
+        // Pointer events auto needed for video controls, but none for drag wrapper
         el.innerHTML = `<video src="${src}" controls style="width:100%; height:100%; object-fit:cover; pointer-events:auto;"></video>`;
         el.style.width = '300px'; el.style.height = '200px';
     } else {
@@ -168,80 +215,53 @@ window.spawnBlock = function(type) {
     closeMobileSidebar();
 };
 
-function createBaseElement() {
-    const el = document.createElement('div');
-    el.className = 'element';
-    const viewportX = window.innerWidth;
-    const viewportY = window.innerHeight;
-    el.style.left = (viewportX / 2 - 50) + 'px';
-    el.style.top = (viewportY / 2 - 50) + 'px';
-    el.style.zIndex = zIndexCounter++;
-    el.style.touchAction = "none";
-    initPointerDrag(el);
-    el.addEventListener('pointerdown', (e) => {
-        if(!e.target.classList.contains('resizer')) { e.stopPropagation(); selectComponent(el); }
-    });
-    return el;
-}
+// /// 4. MEDIA UPLOAD ///
 
-function addToWorkspace(el) {
-    const ws = document.getElementById('workspace');
-    const ph = ws.querySelector('.placeholder-msg');
-    if(ph) ph.remove();
-    const r = document.createElement('div');
-    r.className = 'resizer se';
-    el.appendChild(r);
-    initPointerResize(el, r);
-    ws.appendChild(el);
-    selectComponent(el);
-}
+window.triggerMediaUpload = function() { document.getElementById('media-upload-input').click(); };
 
-// /// 4. PHYSICS ENGINE ///
-
-function initPointerDrag(el) {
-    let isDragging = false, startX, startY, initialLeft, initialTop;
-    el.addEventListener('pointerdown', (e) => {
-        if(e.target.classList.contains('resizer')) return;
-        e.preventDefault(); el.setPointerCapture(e.pointerId);
-        isDragging = true; startX = e.clientX; startY = e.clientY; initialLeft = el.offsetLeft; initialTop = el.offsetTop;
-        el.style.cursor = 'grabbing';
-    });
-    el.addEventListener('pointermove', (e) => {
-        if(!isDragging) return;
-        el.style.left = `${initialLeft + (e.clientX - startX)}px`;
-        el.style.top = `${initialTop + (e.clientY - startY)}px`;
-    });
-    el.addEventListener('pointerup', (e) => {
-        isDragging = false; el.style.cursor = 'grab'; el.releasePointerCapture(e.pointerId);
+function handleMediaUpload(e) {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+    files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            const src = evt.target.result;
+            const type = file.type.startsWith('video/') ? 'video' : 'image';
+            uploadedMedia.push({ src, type });
+            renderThumbnail(src, type);
+        };
+        reader.readAsDataURL(file);
     });
 }
 
-function initPointerResize(el, resizer) {
-    let isResizing = false, startX, startY, startW, startH;
-    resizer.addEventListener('pointerdown', (e) => {
-        e.stopPropagation(); e.preventDefault(); resizer.setPointerCapture(e.pointerId);
-        isResizing = true; startX = e.clientX; startY = e.clientY;
-        startW = parseInt(document.defaultView.getComputedStyle(el).width, 10);
-        startH = parseInt(document.defaultView.getComputedStyle(el).height, 10);
-    });
-    resizer.addEventListener('pointermove', (e) => {
-        if(!isResizing) return;
-        el.style.width = `${startW + (e.clientX - startX)}px`;
-        el.style.height = `${startH + (e.clientY - startY)}px`;
-    });
-    resizer.addEventListener('pointerup', (e) => {
-        isResizing = false; resizer.releasePointerCapture(e.pointerId);
-    });
+function renderThumbnail(src, type) {
+    const grid = document.getElementById('media-grid');
+    const thumb = document.createElement('div');
+    thumb.className = 'media-thumb';
+    if(type === 'video') {
+        thumb.innerHTML = '<i data-lucide="video" style="color:#fff;"></i>';
+        thumb.style.display = 'flex'; thumb.style.alignItems = 'center'; thumb.style.justifyContent = 'center';
+    } else {
+        thumb.style.backgroundImage = `url(${src})`;
+    }
+    // Prevent default click, use spawn
+    thumb.onclick = (e) => { e.preventDefault(); spawnMedia(src, type); };
+    grid.insertBefore(thumb, grid.firstElementChild);
+    if(window.lucide) lucide.createIcons();
 }
 
-// /// 5. UTILITIES ///
+// /// 5. UTILITIES & UI ///
 
 function selectComponent(el) {
     if(selectedElement) selectedElement.classList.remove('selected');
-    selectedElement = el; el.classList.add('selected'); el.style.zIndex = zIndexCounter++;
+    selectedElement = el;
+    el.classList.add('selected');
+    el.style.zIndex = zIndexCounter++;
+
     document.getElementById('no-selection').style.display = 'none';
     document.getElementById('editor-controls').style.display = 'block';
     
+    // Update Props Panel
     const pText = document.getElementById('prop-text');
     const pLink = document.getElementById('prop-link');
     const pZ = document.getElementById('prop-z');
@@ -255,12 +275,15 @@ function selectComponent(el) {
          if(pText) pText.value = ""; if(pLink) pLink.value = "";
     }
     if(pZ) pZ.value = el.style.zIndex;
+
     if(window.innerWidth <= 768) document.getElementById('sidebar-right').classList.add('mobile-open');
 }
 
 function deselectAll() {
-    if(selectedElement) selectedElement.classList.remove('selected'); selectedElement = null;
-    document.getElementById('editor-controls').style.display = 'none'; document.getElementById('no-selection').style.display = 'block';
+    if(selectedElement) selectedElement.classList.remove('selected');
+    selectedElement = null;
+    document.getElementById('editor-controls').style.display = 'none';
+    document.getElementById('no-selection').style.display = 'block';
 }
 
 function updateProps(e) {
@@ -278,14 +301,50 @@ function updateProps(e) {
     } else if(id === 'prop-z') selectedElement.style.zIndex = val;
 }
 
-function deleteSelected() { if(selectedElement) { selectedElement.remove(); deselectAll(); } }
+function deleteSelected() { 
+    if(selectedElement) { selectedElement.remove(); deselectAll(); } 
+}
 
-// /// 6. DEPLOY & ANALYTICS ///
+// /// 6. PAGE MANAGEMENT ///
+
+window.switchPage = function(newPage) {
+    if (currentPage === newPage) return;
+    // Save
+    pageStates[currentPage] = document.getElementById('workspace').innerHTML;
+    // UI
+    document.querySelectorAll('.page-item').forEach(p => p.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+    document.getElementById('current-page-label').innerText = newPage.toUpperCase();
+    // Load
+    currentPage = newPage;
+    document.getElementById('workspace').innerHTML = (!pageStates[newPage] || pageStates[newPage].trim() === '') ? '<div class="placeholder-msg">/// EMPTY SECTOR ///</div>' : pageStates[newPage];
+    // Rebind Physics to new elements
+    rebindPhysics();
+    if(window.innerWidth <= 768) closeMobileSidebar();
+};
+
+function restorePageState(page) {
+    pageStates[page] = document.getElementById('workspace').innerHTML;
+}
+
+function rebindPhysics() {
+    const elements = document.querySelectorAll('.element');
+    elements.forEach(el => {
+        // Re-inject physics
+        initPointerDrag(el);
+        el.style.touchAction = "none"; // Ensure flag is set
+        el.addEventListener('pointerdown', (e) => {
+            if(!e.target.classList.contains('resizer')) { e.stopPropagation(); selectComponent(el); }
+        });
+        const r = el.querySelector('.resizer');
+        if(r) initPointerResize(el, r);
+    });
+}
+
+// /// 7. DEPLOYMENT & MODALS ///
 
 window.deploySequence = function() {
-    console.log("DEPLOY SEQUENCE STARTED");
     const build = document.getElementById('workspace').innerHTML;
-    // Removed strict validation to ensure modal opens even if empty
     localStorage.setItem('nmv_pending_build', build);
     document.getElementById('payment-modal').style.display = 'flex';
 };
@@ -294,43 +353,19 @@ window.closePayment = () => document.getElementById('payment-modal').style.displ
 
 window.processLicense = (code, url) => {
     localStorage.setItem('nmv_active_license', code);
-    window.location.href = url; // THIS TRIGGERS STRIPE
+    window.location.href = url;
 };
 
-window.initAnalytics = function() {
-    const ctx = document.getElementById('trafficChart');
-    if(!ctx) return;
-    if(analyticsChart) analyticsChart.destroy();
-    analyticsChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
-            datasets: [{ label: 'VISITORS', data: [5,12,19,3,5,2,10], borderColor: '#00f3ff', backgroundColor: 'rgba(0,243,255,0.1)', fill: true }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, scales: { x: { ticks: { color: '#666' } }, y: { ticks: { color: '#666' } } } }
-    });
-};
-window.openAnalytics = () => document.getElementById('modal-analytics').style.display = 'flex';
-window.closeModal = (id) => document.getElementById(id).style.display = 'none';
-
-// /// 7. UI TOGGLES ///
-
-window.switchLeftTab = function(tab) {
-    document.querySelectorAll('.left-panel').forEach(p => p.style.display = 'none');
-    document.getElementById(`panel-${tab}`).style.display = 'block';
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    event.currentTarget.classList.add('active');
-};
-
+// UI Toggles
 window.toggleSidebar = function(side) { document.getElementById(`sidebar-${side}`).classList.toggle('mobile-open'); };
 function closeMobileSidebar() { if(window.innerWidth <= 768) document.getElementById('sidebar-left').classList.remove('mobile-open'); }
 window.togglePreview = () => document.body.classList.toggle('preview-active');
 
+// Spec Sheet
 window.loadSpec = function(id) {
     const data = PRODUCT_CATALOG[id] || PRODUCT_CATALOG['core'];
     const container = document.getElementById('spec-container');
     document.querySelectorAll('.arch-btn').forEach(btn => btn.classList.remove('active'));
-    // Visual selection logic would go here
     if(container) {
         container.innerHTML = `
             <div class="spec-header"><h2 class="spec-title">${data.title}</h2><div class="spec-price">${data.price}</div></div>
@@ -342,3 +377,16 @@ window.loadSpec = function(id) {
         `;
     }
 };
+
+window.initAnalytics = function() {
+    const ctx = document.getElementById('trafficChart');
+    if(!ctx) return;
+    if(analyticsChart) analyticsChart.destroy();
+    analyticsChart = new Chart(ctx, {
+        type: 'line',
+        data: { labels: ['M','T','W','T','F','S','S'], datasets: [{ label: 'TRAFFIC', data: [5,12,19,3,5,2,10], borderColor: '#00f3ff', backgroundColor: 'rgba(0,243,255,0.1)', fill: true }] },
+        options: { responsive: true, maintainAspectRatio: false, scales: { x: { ticks: { color: '#666' } }, y: { ticks: { color: '#666' } } } }
+    });
+};
+window.openAnalytics = () => document.getElementById('modal-analytics').style.display = 'flex';
+window.closeModal = (id) => document.getElementById(id).style.display = 'none';
