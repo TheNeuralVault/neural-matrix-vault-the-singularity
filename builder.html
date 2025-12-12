@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEURAL CONSTRUCTOR | v10.0</title>
+    <title>NEURAL CONSTRUCTOR | v11.0</title>
     
     <!-- /// GOOGLE TAG /// -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-P1PCVNCCE4"></script>
@@ -39,7 +39,7 @@
         ::-webkit-scrollbar-track { background: #000; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 
-        .interface-wrapper { display: flex; height: 100vh; width: 100%; position: relative; transition: 0.3s; }
+        .interface-wrapper { display: flex; height: 100vh; width: 100%; position: relative; }
 
         /* MOBILE NAV */
         .mobile-nav { 
@@ -65,8 +65,20 @@
             color: var(--accent);
         }
 
+        /* TABS */
+        .tab-triggers { display: flex; border-bottom: 1px solid var(--border); }
+        .tab-btn { 
+            flex: 1; padding: 15px; background: none; border: none; color: #666; 
+            cursor: pointer; font-family: var(--font-mono); font-size: 0.7rem; 
+            transition: 0.3s; border-bottom: 2px solid transparent;
+        }
+        .tab-btn:hover { color: #fff; }
+        .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); background: var(--accent-dim); }
+
         /* PANELS */
-        .left-panel { padding: 20px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
+        .left-panel { padding: 20px; display: none; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
+        .left-panel.active { display: block; }
+        
         .tool-category { font-size: 0.6rem; color: #666; margin: 25px 0 10px 0; font-family: var(--font-mono); font-weight: bold; text-transform: uppercase; }
 
         .draggable-item { 
@@ -75,6 +87,11 @@
             font-size: 0.75rem; font-family: var(--font-mono); transition: 0.2s;
         }
         .draggable-item:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+        /* PAGE LIST */
+        .page-item { padding: 15px; border: 1px solid var(--border); margin-bottom: 10px; cursor: pointer; font-family: var(--font-mono); font-size: 0.8rem; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+        .page-item:hover { border-color: #fff; }
+        .page-item.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
 
         /* MEDIA DOCK */
         .media-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 20px; }
@@ -96,6 +113,7 @@
             height: 60px; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.8); 
             display: flex; justify-content: space-between; align-items: center; padding: 0 20px; z-index: 90;
         }
+        .current-view { font-family: var(--font-mono); font-size: 0.75rem; color: #888; }
 
         .drop-zone { flex: 1; background: transparent; overflow: hidden; position: relative; width: 100%; height: 100%; touch-action: none; }
         .placeholder-msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #333; font-family: var(--font-mono); pointer-events: none; border: 1px dashed #333; padding: 20px; }
@@ -105,8 +123,7 @@
         .element:hover { outline: 1px dashed rgba(0,243,255,0.3); cursor: grab; }
         .element.selected { outline: 2px solid var(--accent); z-index: 1000 !important; cursor: grabbing; }
         .element img, .element video { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
-        /* Link styles inside elements */
-        .element a { color: inherit; text-decoration: none; pointer-events: none; /* Disabled in builder, active in preview */ }
+        .element a { color: inherit; text-decoration: none; pointer-events: none; }
 
         /* PROPERTIES */
         .properties-panel { padding: 25px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
@@ -138,23 +155,20 @@
         .spec-text { color: #ccc; font-size: 0.9rem; line-height: 1.6; }
         .spec-actions { margin-top: 40px; }
 
-        /* PREVIEW MODE EXIT BUTTON */
+        /* PREVIEW MODE */
         #exit-preview-btn {
             position: fixed; bottom: 30px; right: 30px; z-index: 2147483647;
             background: #ff0055; color: #fff; border: none; padding: 15px 30px;
             font-weight: bold; font-family: 'Space Mono'; display: none; cursor: pointer;
             box-shadow: 0 0 20px rgba(255,0,85,0.5);
         }
-
-        /* PREVIEW MODE STATES */
         body.preview-active .sidebar-left, 
         body.preview-active .sidebar-right, 
         body.preview-active .mobile-nav, 
         body.preview-active .canvas-header { display: none !important; }
-        
         body.preview-active .element { outline: none !important; }
         body.preview-active .resizer { display: none !important; }
-        body.preview-active .element a { pointer-events: auto !important; /* ENABLE LINKS IN PREVIEW */ }
+        body.preview-active .element a { pointer-events: auto !important; }
         body.preview-active #exit-preview-btn { display: block; }
         body.preview-active #workspace { width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; background: #000; z-index: 9999; }
 
@@ -193,7 +207,15 @@
     <!-- LEFT -->
     <aside class="sidebar-left" id="sidebar-left">
         <div class="brand">NMV_ARCHITECT</div>
-        <div id="panel-tools" class="left-panel">
+        
+        <!-- TABS REINSTATED -->
+        <div class="tab-triggers">
+            <button class="tab-btn active" onclick="switchLeftTab('tools')">TOOLS</button>
+            <button class="tab-btn" onclick="switchLeftTab('pages')">PAGES</button>
+        </div>
+
+        <!-- PANEL: TOOLS -->
+        <div id="panel-tools" class="left-panel active">
             <div class="tool-category" style="margin-top:0;">MEDIA VAULT</div>
             <button class="btn-upload" onclick="triggerMediaUpload()"><i data-lucide="upload-cloud"></i> UPLOAD</button>
             <div class="media-grid" id="media-grid"></div>
@@ -204,15 +226,22 @@
             <div class="draggable-item" onclick="spawnBlock('button')"><i data-lucide="mouse-pointer-2"></i> ACTION BUTTON</div>
             <div class="draggable-item" onclick="spawnBlock('hero')"><i data-lucide="monitor"></i> HERO SECTION</div>
         </div>
+
+        <!-- PANEL: PAGES REINSTATED -->
+        <div id="panel-pages" class="left-panel" style="display:none;">
+            <div class="tool-category" style="margin-top:0;">SITE STRUCTURE</div>
+            <div class="page-item active" onclick="switchPage('home')"><i data-lucide="home"></i> HOME</div>
+            <div class="page-item" onclick="switchPage('about')"><i data-lucide="file"></i> ABOUT</div>
+            <div class="page-item" onclick="switchPage('services')"><i data-lucide="briefcase"></i> SERVICES</div>
+            <div class="page-item" onclick="switchPage('contact')"><i data-lucide="mail"></i> CONTACT</div>
+        </div>
     </aside>
 
     <!-- CENTER -->
     <main class="canvas-area">
         <div class="canvas-header">
-            <div class="brand" style="border:none; padding:0;">WORKSPACE</div>
-            <div style="display:flex; gap:10px;">
-                <button class="sys-btn" onclick="togglePreview()">PREVIEW</button>
-            </div>
+            <div class="current-view">PAGE: <span id="current-page-label" style="color:var(--accent);">HOME</span></div>
+            <button class="sys-btn" onclick="togglePreview()">PREVIEW</button>
         </div>
         <div id="workspace" class="drop-zone">
             <div class="placeholder-msg">/// CLICK TOOLS TO SPAWN ///</div>
@@ -232,8 +261,8 @@
                 <label class="tool-category">CONTENT</label>
                 <textarea id="prop-text" class="input-titanium" rows="3"></textarea>
                 
-                <label class="tool-category" style="margin-top:20px;">LINK URL (HTTPS://...)</label>
-                <input type="text" id="prop-link" class="input-titanium" placeholder="Enter link...">
+                <label class="tool-category" style="margin-top:20px;">LINK URL (HTTPS://)</label>
+                <input type="text" id="prop-link" class="input-titanium" placeholder="https://...">
 
                 <label class="tool-category" style="margin-top:20px;">BACKGROUND</label>
                 <input type="color" id="prop-color" style="width:100%; height:40px; background:none; border:1px solid #333;">
@@ -256,7 +285,7 @@
     </div>
 </div>
 
-<!-- /// INTELLIGENT PRODUCT SPECIFICATION MODAL /// -->
+<!-- /// PAYMENT SPECIFICATION MODAL /// -->
 <div id="payment-modal" class="modal-overlay">
     <div class="modal-box">
         <button onclick="closePayment()" style="position:absolute; top:20px; right:20px; z-index:99; background:none; border:none; color:#666; font-size:1.5rem; cursor:pointer;">&times;</button>
@@ -275,7 +304,7 @@
 
         <!-- SPEC SHEET -->
         <div class="modal-content" id="spec-container">
-            <!-- DYNAMIC CONTENT INJECTED HERE BY JS -->
+            <!-- INJECTED BY JS -->
         </div>
     </div>
 </div>
