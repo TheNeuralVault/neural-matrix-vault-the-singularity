@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEURAL CONSTRUCTOR | v5.0</title>
+    <title>NEURAL CONSTRUCTOR | v8.0</title>
     
     <!-- /// GOOGLE TAG /// -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-P1PCVNCCE4"></script>
@@ -14,7 +14,7 @@
       gtag('config', 'G-P1PCVNCCE4');
     </script>
 
-    <!-- /// FONTS & ICONS /// -->
+    <!-- /// ASSETS /// -->
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;500;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -41,20 +41,10 @@
 
         .interface-wrapper { display: flex; height: 100vh; width: 100%; position: relative; }
 
-        /* MOBILE NAV */
-        .mobile-nav { 
-            display: none; 
-            height: 60px; background: #000; border-bottom: 1px solid var(--border);
-            justify-content: space-between; align-items: center; padding: 0 20px;
-            position: fixed; top: 0; left: 0; width: 100%; z-index: 999;
-        }
-        .mobile-nav button { background: none; border: none; color: #fff; display: flex; gap: 5px; align-items: center; cursor: pointer; }
-        .brand-mobile { font-family: var(--font-mono); color: var(--accent); font-weight: bold; letter-spacing: 2px; }
-
         /* SIDEBARS */
         .sidebar-left, .sidebar-right { 
             width: 320px; background: var(--bg-panel); border-right: 1px solid var(--border); 
-            display: flex; flex-direction: column; z-index: 40; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; flex-direction: column; z-index: 100; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             backdrop-filter: blur(10px);
         }
         .sidebar-right { border-left: 1px solid var(--border); border-right: none; }
@@ -63,36 +53,19 @@
             padding: 25px; font-family: var(--font-mono); font-weight: 700; 
             border-bottom: 1px solid var(--border); letter-spacing: 1px;
             background: linear-gradient(90deg, rgba(0,243,255,0.05), transparent);
+            color: var(--accent);
         }
-        .highlight { color: var(--accent); text-shadow: 0 0 10px var(--accent-dim); }
-
-        /* TABS */
-        .tab-triggers { display: flex; border-bottom: 1px solid var(--border); }
-        .tab-btn { 
-            flex: 1; padding: 15px; background: none; border: none; color: #666; 
-            cursor: pointer; font-family: var(--font-mono); font-size: 0.7rem; 
-            transition: 0.3s; border-bottom: 2px solid transparent;
-        }
-        .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); background: var(--accent-dim); }
 
         /* PANELS */
-        .left-panel { padding: 20px; display: none; overflow-y: auto; flex: 1; }
-        .left-panel.active { display: block; animation: fadeIn 0.3s ease; }
-
-        .tool-category { 
-            font-size: 0.6rem; color: #666; margin: 25px 0 10px 0; 
-            font-family: var(--font-mono); font-weight: bold; text-transform: uppercase;
-        }
+        .left-panel { padding: 20px; overflow-y: auto; flex: 1; }
+        .tool-category { font-size: 0.6rem; color: #666; margin: 25px 0 10px 0; font-family: var(--font-mono); font-weight: bold; text-transform: uppercase; }
 
         .draggable-item { 
             padding: 15px; border: 1px solid var(--border); margin-bottom: 10px; background: rgba(255,255,255,0.03); 
             border-radius: 4px; cursor: pointer; display: flex; gap: 10px; align-items: center; 
             font-size: 0.75rem; font-family: var(--font-mono); transition: 0.2s;
         }
-        .draggable-item:hover { 
-            border-color: var(--accent); color: var(--accent); 
-            background: var(--accent-dim); transform: translateX(5px);
-        }
+        .draggable-item:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
 
         /* MEDIA DOCK */
         .media-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 20px; }
@@ -101,267 +74,161 @@
             background-size: cover; background-position: center; cursor: pointer; 
             transition: 0.2s; position: relative;
         }
-        .media-thumb:hover { border-color: var(--accent); box-shadow: 0 0 10px var(--accent-dim); }
-        .media-counter { font-family: var(--font-mono); font-size: 0.6rem; color: #666; text-align: right; margin-bottom: 5px; }
+        .media-thumb:hover { border-color: var(--accent); }
 
         /* CANVAS */
         .canvas-area { 
             flex: 1; background: #050505; display: flex; flex-direction: column; 
-            background-image: 
-                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-image: linear-gradient(#111 1px, transparent 1px), linear-gradient(90deg, #111 1px, transparent 1px);
             background-size: 40px 40px;
-            position: relative;
+            position: relative; overflow: hidden;
         }
         .canvas-header { 
             height: 60px; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.8); 
-            display: flex; justify-content: space-between; align-items: center; padding: 0 20px;
-            backdrop-filter: blur(5px);
+            display: flex; justify-content: space-between; align-items: center; padding: 0 20px; z-index: 90;
         }
-        .current-view { font-family: var(--font-mono); font-size: 0.75rem; color: #888; }
 
-        .drop-zone { 
-            flex: 1; margin: 40px; background: #fff; overflow-y: auto; 
-            box-shadow: 0 0 100px rgba(0,0,0,0.5); color: #000; position: relative; transition: 0.3s;
-        }
-        .drop-zone.mobile-mode { max-width: 375px; border: 10px solid #333; border-radius: 20px; margin: 20px auto; }
-        
-        .placeholder-msg { 
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            color: #ccc; font-family: var(--font-mono); pointer-events: none; border: 1px dashed #ccc; padding: 20px;
-        }
+        .drop-zone { flex: 1; background: transparent; overflow: hidden; position: relative; width: 100%; height: 100%; }
+        .placeholder-msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #333; font-family: var(--font-mono); pointer-events: none; border: 1px dashed #333; padding: 20px; }
 
         /* ELEMENTS */
-        .element { position: relative; transition: 0.2s; }
-        .element:hover { outline: 2px solid rgba(0,243,255,0.5); cursor: move; }
-        .element.selected { outline: 2px solid var(--accent); z-index: 10; }
-        
-        /* PROPERTIES PANEL */
-        .properties-panel { padding: 25px; overflow-y: auto; flex: 1; }
-        .input-titanium { 
-            width: 100%; background: #080808; border: 1px solid var(--border); color: #fff; 
-            padding: 12px; font-family: var(--font-mono); margin-top: 5px; outline: none; border-radius: 4px;
-        }
+        .element { position: absolute; min-width: 50px; min-height: 50px; transition: box-shadow 0.2s; user-select: none; }
+        .element:hover { outline: 1px dashed rgba(0,243,255,0.3); cursor: grab; }
+        .element.selected { outline: 2px solid var(--accent); z-index: 1000 !important; cursor: grabbing; }
+        .element img, .element video { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
 
-        .btn-upload {
-            width: 100%; background: #222; border: 1px dashed #666; color: #fff; padding: 15px; 
-            cursor: pointer; margin-bottom: 10px; display: flex; justify-content: center; gap: 10px;
-            font-family: var(--font-mono); font-size: 0.75rem; transition: 0.2s;
-        }
+        /* PROPERTIES */
+        .properties-panel { padding: 25px; overflow-y: auto; flex: 1; }
+        .input-titanium { width: 100%; background: #080808; border: 1px solid var(--border); color: #fff; padding: 12px; font-family: var(--font-mono); margin-top: 5px; outline: none; border-radius: 4px; }
+        .btn-upload { width: 100%; background: #222; border: 1px dashed #666; color: #fff; padding: 15px; cursor: pointer; margin-bottom: 10px; display: flex; justify-content: center; gap: 10px; font-family: var(--font-mono); font-size: 0.75rem; transition: 0.2s; }
 
         /* RESIZERS */
-        .resizer { position: absolute; width: 20px; height: 20px; background: var(--accent); z-index: 20; display: none; border-radius: 50%; border: 2px solid #000; }
+        .resizer { position: absolute; width: 15px; height: 15px; background: var(--accent); z-index: 1001; display: none; border: 1px solid #000; }
         .element.selected .resizer { display: block; }
-        .resizer.nw { top: -10px; left: -10px; }
-        .resizer.ne { top: -10px; right: -10px; }
-        .resizer.sw { bottom: -10px; left: -10px; }
-        .resizer.se { bottom: -10px; right: -10px; }
-
-        /* MOBILE RESPONSIVENESS */
-        @media (max-width: 768px) {
-            .interface-wrapper { flex-direction: column; padding-top: 60px; }
-            .mobile-nav { display: flex; }
-            
-            .sidebar-left { 
-                position: fixed; top: 60px; left: 0; bottom: 0; width: 85%; 
-                transform: translateX(-100%); box-shadow: 10px 0 30px rgba(0,0,0,0.5);
-            }
-            .sidebar-right { 
-                position: fixed; top: 60px; right: 0; bottom: 0; width: 85%; 
-                transform: translateX(100%); box-shadow: -10px 0 30px rgba(0,0,0,0.5);
-            }
-            .mobile-open { transform: translateX(0); }
-            .canvas-header { display: none; } 
-            .drop-zone { margin: 10px; min-height: 80vh; max-width: 100%; border: none; }
-        }
+        .resizer.se { bottom: -5px; right: -5px; cursor: se-resize; }
 
         /* UTILS */
-        .page-item { padding: 10px; border: 1px solid #333; margin-bottom: 5px; cursor: pointer; font-family: var(--font-mono); font-size: 0.8rem; display: flex; align-items: center; gap: 10px; }
-        .page-item.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
-        
-        .sys-btn { flex: 1; background: #111; border: 1px solid var(--border); color: #888; padding: 10px; border-radius: 4px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
-        .sys-btn:hover { color: #fff; border-color: #fff; }
+        .sys-btn { flex: 1; background: #111; border: 1px solid var(--border); color: #888; padding: 10px; border-radius: 4px; cursor: pointer; font-family: var(--font-mono); font-size: 0.8rem;}
         .sys-btn.primary { background: var(--accent); color: #000; border: none; font-weight: bold; }
-        .sys-btn.primary:hover { box-shadow: 0 0 20px var(--accent-dim); }
-
-        /* /// MODALS /// */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 999; display: none; justify-content: center; align-items: center; }
-        .modal-box { width: 90%; max-width: 800px; background: #111; border: 1px solid var(--border); padding: 40px; position: relative; box-shadow: 0 0 50px rgba(0,243,255,0.1); }
         
-        /* ANALYTICS CHART */
-        .chart-container { height: 300px; width: 100%; }
-
-        /* PAYMENT GRID */
-        .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 30px; }
-        .product-card { border: 1px solid #333; padding: 20px; cursor: pointer; transition: 0.3s; text-align: center; background: rgba(255,255,255,0.02); }
-        .product-card:hover { border-color: var(--accent); background: rgba(0,243,255,0.05); transform: translateY(-5px); }
-        .p-title { font-family: 'Space Mono'; color: #fff; margin-bottom: 10px; font-size: 0.9rem; font-weight: bold; }
-        .p-price { color: var(--accent); font-weight: bold; font-size: 1.2rem; margin-bottom: 5px; }
-        .p-desc { color: #666; font-size: 0.7rem; font-family: 'Space Mono'; }
-
-        @media(max-width: 768px) { .product-grid { grid-template-columns: 1fr; } }
+        /* /// ADVANCED PAYMENT MODAL (SPECIFICATION UI) /// */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; display: none; justify-content: center; align-items: center; }
+        .modal-box { 
+            width: 95%; max-width: 1000px; height: 80vh; 
+            background: #050505; border: 1px solid var(--border); 
+            display: flex; overflow: hidden; box-shadow: 0 0 50px rgba(0,243,255,0.1);
+        }
         
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Modal Left: List */
+        .modal-sidebar { width: 300px; background: #0a0a0a; border-right: 1px solid var(--border); padding: 20px; overflow-y: auto; }
+        .arch-btn { 
+            width: 100%; padding: 15px; text-align: left; background: #111; border: 1px solid #333; 
+            color: #888; margin-bottom: 10px; cursor: pointer; font-family: 'Space Mono'; transition: 0.3s;
+        }
+        .arch-btn:hover { border-color: var(--accent); color: #fff; }
+        .arch-btn.active { background: var(--accent); color: #000; font-weight: bold; border-color: var(--accent); }
+
+        /* Modal Right: Specs */
+        .modal-content { flex: 1; padding: 40px; overflow-y: auto; position: relative; }
+        .spec-header { border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 20px; }
+        .spec-title { font-size: 2rem; color: #fff; font-weight: 800; margin: 0; }
+        .spec-price { color: var(--accent); font-family: 'Space Mono'; font-size: 1.2rem; margin-top: 10px; }
+        
+        .spec-section { margin-bottom: 30px; }
+        .spec-label { font-family: 'Space Mono'; color: #666; font-size: 0.8rem; border-bottom: 1px solid #333; margin-bottom: 10px; padding-bottom: 5px; display: inline-block; }
+        .spec-text { color: #ccc; font-size: 0.9rem; line-height: 1.6; }
+        
+        .spec-actions { margin-top: 40px; }
+
+        @media(max-width: 768px) { 
+            .interface-wrapper { flex-direction: column; } 
+            .sidebar-left, .sidebar-right { display: none; }
+            .modal-box { flex-direction: column; height: 100vh; width: 100%; }
+            .modal-sidebar { width: 100%; height: 150px; border-right: none; border-bottom: 1px solid var(--border); }
+        }
     </style>
 </head>
 <body>
 
-<!-- /// 0. ASSET INGESTION CONDUIT /// -->
-<input type="file" id="media-upload-input" hidden accept="image/*">
+<!-- UPLOAD CONDUIT -->
+<input type="file" id="media-upload-input" hidden accept="image/*,video/*" multiple>
 
 <div class="interface-wrapper">
-    
-    <div class="mobile-nav">
-        <button onclick="toggleSidebar('left')"><i data-lucide="menu"></i> TOOLS</button>
-        <div class="brand-mobile">NMV_BUILDER</div>
-        <button onclick="toggleSidebar('right')"><i data-lucide="settings-2"></i> EDIT</button>
-    </div>
-
-    <!-- /// 1. LEFT: THE ARMORY /// -->
+    <!-- LEFT -->
     <aside class="sidebar-left" id="sidebar-left">
-        <div class="brand">NMV<span class="highlight">_ARCHITECT</span></div>
-        
-        <div class="tab-triggers">
-            <button class="tab-btn active" onclick="switchLeftTab('tools')"><i data-lucide="layout-template"></i> TOOLS</button>
-            <button class="tab-btn" onclick="switchLeftTab('pages')"><i data-lucide="files"></i> PAGES</button>
-        </div>
+        <div class="brand">NMV_ARCHITECT</div>
+        <div id="panel-tools" class="left-panel">
+            <div class="tool-category" style="margin-top:0;">MEDIA VAULT</div>
+            <button class="btn-upload" onclick="triggerMediaUpload()"><i data-lucide="upload-cloud"></i> UPLOAD</button>
+            <div class="media-grid" id="media-grid"></div>
 
-        <!-- PANEL: TOOLS -->
-        <div id="panel-tools" class="left-panel active">
-            
-            <!-- MEDIA DOCK -->
-            <div class="tool-category" style="margin-top:0;">MEDIA DOCK (MAX 10)</div>
-            <div class="media-counter"><span id="media-count">0</span>/10 SLOTS USED</div>
-            <div class="media-grid" id="media-grid">
-                <!-- Thumbnails inject here -->
-                <button class="media-thumb" style="display:flex; justify-content:center; align-items:center; border:1px dashed #666;" onclick="triggerMediaUpload()">
-                    <i data-lucide="plus"></i>
-                </button>
-            </div>
-
-            <div class="tool-category">STRUCTURES</div>
-            <div class="draggable-item" onclick="addBlock('header-minimal')"><i data-lucide="minus"></i> HEADER_MINIMAL</div>
-            <div class="draggable-item" onclick="addBlock('hero-matrix')"><i data-lucide="code"></i> HERO_MATRIX</div>
-            <div class="draggable-item" onclick="addBlock('text-split')"><i data-lucide="columns"></i> TEXT_SPLIT</div>
-            <div class="draggable-item" onclick="addBlock('image')"><i data-lucide="image"></i> IMAGE_VESSEL</div>
-            <div class="draggable-item" onclick="addBlock('button-neon')"><i data-lucide="zap"></i> BTN_NEON</div>
-        </div>
-
-        <!-- PANEL: PAGES -->
-        <div id="panel-pages" class="left-panel">
-            <div class="page-list" id="page-manager">
-                <div class="page-item active" onclick="switchPage('home')"><i data-lucide="home"></i> HOME</div>
-                <div class="page-item" onclick="switchPage('about')"><i data-lucide="file"></i> ABOUT</div>
-                <div class="page-item" onclick="switchPage('services')"><i data-lucide="briefcase"></i> SERVICES</div>
-                <div class="page-item" onclick="switchPage('contact')"><i data-lucide="mail"></i> CONTACT</div>
-            </div>
+            <div class="tool-category">PRIMITIVES</div>
+            <div class="draggable-item" onclick="spawnBlock('text')"><i data-lucide="type"></i> TEXT NODE</div>
+            <div class="draggable-item" onclick="spawnBlock('box')"><i data-lucide="square"></i> CONTAINER BOX</div>
+            <div class="draggable-item" onclick="spawnBlock('button')"><i data-lucide="mouse-pointer-2"></i> ACTION BUTTON</div>
+            <div class="draggable-item" onclick="spawnBlock('hero')"><i data-lucide="monitor"></i> HERO SECTION</div>
         </div>
     </aside>
 
-    <!-- /// 2. CENTER: CANVAS /// -->
+    <!-- CENTER -->
     <main class="canvas-area">
         <div class="canvas-header">
-            <div class="current-view">PAGE: <span id="current-page-label" class="highlight">HOME</span></div>
-            <div class="device-toggles">
-                <button class="device-btn active" onclick="setDevice('desktop')"><i data-lucide="monitor"></i></button>
-                <button class="device-btn" onclick="setDevice('mobile')"><i data-lucide="smartphone"></i></button>
+            <div class="brand" style="border:none; padding:0;">WORKSPACE</div>
+            <div style="display:flex; gap:10px;">
+                <button class="sys-btn" onclick="togglePreview()">PREVIEW</button>
             </div>
-            <button class="btn-preview" onclick="togglePreview()">PREVIEW</button>
         </div>
-        
-        <div id="workspace-container" style="flex:1; display:flex; justify-content:center; overflow-y:auto; -webkit-overflow-scrolling: touch;">
-            <div id="workspace" class="drop-zone desktop-view">
-                <div class="placeholder-msg">/// TAP TOOLS TO DEPLOY ///</div>
-            </div>
+        <div id="workspace" class="drop-zone">
+            <div class="placeholder-msg">/// CLICK TOOLS TO SPAWN ///</div>
         </div>
     </main>
 
-    <!-- /// 3. RIGHT: PROPERTIES /// -->
+    <!-- RIGHT -->
     <aside class="sidebar-right" id="sidebar-right">
         <div style="padding:20px; border-bottom:1px solid #333;">
-            <button class="sys-btn primary" onclick="deploySequence()" style="width:100%; margin-bottom:10px;">DEPLOY SITE</button>
-            <button class="sys-btn" onclick="openAnalytics()" style="width:100%;">ANALYTICS</button>
+            <button class="sys-btn primary" onclick="deploySequence()" style="width:100%;">DEPLOY SITE</button>
         </div>
-
         <div id="properties-panel" class="properties-panel">
-            <div class="tool-category">PROPERTIES</div>
-            <div id="no-selection" style="text-align:center; color:#444; font-family:'Space Mono'; margin-top:30px;">SELECT ELEMENT</div>
-
+            <div class="tool-category">ATTRIBUTES</div>
+            <div id="no-selection" style="color:#444;">SELECT ELEMENT</div>
             <div id="editor-controls" style="display:none;">
-                <label class="tool-category">TEXT CONTENT</label>
+                <label class="tool-category">CONTENT</label>
                 <textarea id="prop-text" class="input-titanium" rows="3"></textarea>
-                
                 <label class="tool-category" style="margin-top:20px;">BACKGROUND</label>
                 <input type="color" id="prop-color" style="width:100%; height:40px; background:none; border:1px solid #333;">
-
-                <label class="tool-category" style="margin-top:20px;">PADDING</label>
-                <input type="range" id="prop-padding" min="0" max="100" style="width:100%;">
-
-                <button class="btn-upload" style="margin-top:30px; border-color:red; color:red;" onclick="deleteSelected()">DELETE BLOCK</button>
+                <label class="tool-category" style="margin-top:20px;">Z-INDEX</label>
+                <input type="number" id="prop-z" class="input-titanium" value="1">
+                <button class="btn-upload" style="margin-top:30px; border-color:red; color:red;" onclick="deleteSelected()">INCINERATE</button>
             </div>
         </div>
     </aside>
-
 </div>
 
-<!-- /// 4. ANALYTICS MODAL /// -->
-<div id="modal-analytics" class="modal-overlay">
-    <div class="modal-box">
-        <h3 style="font-family:'Space Mono'; margin-bottom:20px;">TRAFFIC_FLUX</h3>
-        <div class="chart-container"><canvas id="trafficChart"></canvas></div>
-        <button class="btn-upload" onclick="closeModal('modal-analytics')">CLOSE</button>
-    </div>
-</div>
-
-<!-- /// 5. PAYMENT INTERCEPTOR MODAL (NEW) /// -->
+<!-- /// INTELLIGENT PRODUCT SPECIFICATION MODAL /// -->
 <div id="payment-modal" class="modal-overlay">
-    <div class="modal-box" style="border-color: var(--accent);">
-        <button onclick="closePayment()" style="position:absolute; top:20px; right:20px; background:none; border:none; color:#666; cursor:pointer; font-size:1.5rem;">&times;</button>
+    <div class="modal-box">
+        <button onclick="closePayment()" style="position:absolute; top:20px; right:20px; z-index:99; background:none; border:none; color:#666; font-size:1.5rem;">&times;</button>
         
-        <div style="text-align:center; margin-bottom:30px;">
-            <i data-lucide="lock" style="color:var(--accent); width:50px; height:50px; margin-bottom:20px;"></i>
-            <h2 style="color:#fff; margin:0;">SELECT ARCHITECTURE LICENSE</h2>
-            <p style="color:#888; font-family:'Space Mono'; font-size:0.8rem; margin-top:10px;">CONFIRM PROTOCOL TO INITIATE DEPLOYMENT</p>
+        <!-- SIDEBAR SELECTOR -->
+        <div class="modal-sidebar">
+            <div class="tool-category">IDENTIFY ARCHITECTURE</div>
+            <div class="arch-btn active" onclick="loadSpec('core')">NEURAL CORE</div>
+            <div class="arch-btn" onclick="loadSpec('flux')">FLUX VELOCITY</div>
+            <div class="arch-btn" onclick="loadSpec('aero')">AERO PROTOCOL</div>
+            <div class="arch-btn" onclick="loadSpec('nexus')">NEXUS STREAM</div>
+            <div class="arch-btn" onclick="loadSpec('cipher')">CIPHER PROTOCOL</div>
+            <div class="arch-btn" onclick="loadSpec('prism')">PRISM SaaS</div>
+            <div class="arch-btn" onclick="loadSpec('omega')">OMEGA REALITY</div>
         </div>
-        
-        <div class="product-grid">
-            <!-- NEURAL CORE -->
-            <div class="product-card" onclick="processLicense('core', 'https://buy.stripe.com/7sY7sL8dib6SbuvbPt8g001')">
-                <i data-lucide="cpu" style="color:var(--accent); width:30px; height:30px; margin-bottom:10px;"></i>
-                <div class="p-title">NEURAL CORE</div>
-                <div class="p-price">$2,500</div>
-                <div class="p-desc">Flagship 3D Architecture</div>
-            </div>
 
-            <!-- FLUX VELOCITY -->
-            <div class="product-card" onclick="processLicense('flux', 'https://buy.stripe.com/aFa3cv2SY3EqaqrcTx8g002')">
-                <i data-lucide="zap" style="color:#ff0055; width:30px; height:30px; margin-bottom:10px;"></i>
-                <div class="p-title">FLUX VELOCITY</div>
-                <div class="p-price">$2,500</div>
-                <div class="p-desc">High-Speed Landing Systems</div>
-            </div>
-
-            <!-- SIGNAL AMP -->
-            <div class="product-card" onclick="processLicense('signal', 'https://buy.stripe.com/14AcN5alq2Am9mn8Dh8g005')">
-                <i data-lucide="signal" style="color:#00ff00; width:30px; height:30px; margin-bottom:10px;"></i>
-                <div class="p-title">SIGNAL AMP</div>
-                <div class="p-price">$299/mo</div>
-                <div class="p-desc">AI-Driven SEO Protocol</div>
-            </div>
-            
-            <!-- DIGITAL FORTRESS -->
-            <div class="product-card" onclick="processLicense('fortress', 'https://buy.stripe.com/5kQ00jdxCdf0eGH6v98g00g')">
-                <i data-lucide="shield-check" style="color:#ffd700; width:30px; height:30px; margin-bottom:10px;"></i>
-                <div class="p-title">DIGITAL FORTRESS</div>
-                <div class="p-price">$500</div>
-                <div class="p-desc">Security & Encryption</div>
-            </div>
+        <!-- SPEC SHEET -->
+        <div class="modal-content" id="spec-container">
+            <!-- DYNAMIC CONTENT INJECTED HERE BY JS -->
         </div>
     </div>
 </div>
 
 <script src="builder.js"></script>
 <script>lucide.createIcons();</script>
-<script src="defense.js"></script>
 </body>
 </html>
