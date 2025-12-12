@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEURAL CONSTRUCTOR | v4.0</title>
+    <title>NEURAL CONSTRUCTOR | v4.5</title>
     
     <!-- /// GOOGLE TAG /// -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-P1PCVNCCE4"></script>
@@ -32,13 +32,12 @@
         }
 
         body { margin: 0; background: var(--bg-void); color: #fff; font-family: var(--font-head); overflow: hidden; }
-        * { box-sizing: border-box; user-select: none; }
+        * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
 
         /* SCROLLBARS */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #000; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
         .interface-wrapper { display: flex; height: 100vh; width: 100%; position: relative; }
 
@@ -74,7 +73,6 @@
             cursor: pointer; font-family: var(--font-mono); font-size: 0.7rem; 
             transition: 0.3s; border-bottom: 2px solid transparent;
         }
-        .tab-btn:hover { color: #fff; }
         .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); background: var(--accent-dim); }
 
         /* PANELS */
@@ -88,13 +86,23 @@
 
         .draggable-item { 
             padding: 15px; border: 1px solid var(--border); margin-bottom: 10px; background: rgba(255,255,255,0.03); 
-            border-radius: 4px; cursor: grab; display: flex; gap: 10px; align-items: center; 
+            border-radius: 4px; cursor: pointer; display: flex; gap: 10px; align-items: center; 
             font-size: 0.75rem; font-family: var(--font-mono); transition: 0.2s;
         }
         .draggable-item:hover { 
             border-color: var(--accent); color: var(--accent); 
             background: var(--accent-dim); transform: translateX(5px);
         }
+
+        /* MEDIA DOCK */
+        .media-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 20px; }
+        .media-thumb { 
+            width: 100%; aspect-ratio: 1; background: #000; border: 1px solid #333; 
+            background-size: cover; background-position: center; cursor: pointer; 
+            transition: 0.2s; position: relative;
+        }
+        .media-thumb:hover { border-color: var(--accent); box-shadow: 0 0 10px var(--accent-dim); }
+        .media-counter { font-family: var(--font-mono); font-size: 0.6rem; color: #666; text-align: right; margin-bottom: 5px; }
 
         /* CANVAS */
         .canvas-area { 
@@ -112,20 +120,13 @@
         }
         .current-view { font-family: var(--font-mono); font-size: 0.75rem; color: #888; }
 
-        .device-toggles { display: flex; background: #111; border-radius: 4px; border: 1px solid var(--border); }
-        .device-btn { background: none; border: none; padding: 8px 12px; color: #666; cursor: pointer; }
-        .device-btn.active { background: var(--accent); color: #000; }
-
-        .btn-preview { 
-            background: transparent; border: 1px solid var(--accent); color: var(--accent); 
-            padding: 8px 15px; font-family: var(--font-mono); font-size: 0.7rem; cursor: pointer; transition: 0.3s;
-        }
-        .btn-preview:hover { background: var(--accent); color: #000; box-shadow: 0 0 15px var(--accent-dim); }
-
         .drop-zone { 
             flex: 1; margin: 40px; background: #fff; overflow-y: auto; 
             box-shadow: 0 0 100px rgba(0,0,0,0.5); color: #000; position: relative; transition: 0.3s;
         }
+        /* Mobile specific canvas sizing */
+        .drop-zone.mobile-mode { max-width: 375px; border: 10px solid #333; border-radius: 20px; margin: 20px auto; }
+        
         .placeholder-msg { 
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
             color: #ccc; font-family: var(--font-mono); pointer-events: none; border: 1px dashed #ccc; padding: 20px;
@@ -133,45 +134,29 @@
 
         /* ELEMENTS */
         .element { position: relative; transition: 0.2s; }
-        .element:hover { outline: 2px solid rgba(0,243,255,0.5); cursor: pointer; }
+        .element:hover { outline: 2px solid rgba(0,243,255,0.5); cursor: move; }
         .element.selected { outline: 2px solid var(--accent); z-index: 10; }
         
         /* PROPERTIES PANEL */
         .properties-panel { padding: 25px; overflow-y: auto; flex: 1; }
-        .panel-header { font-size: 0.7rem; color: #666; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 20px; font-family: var(--font-mono); }
-        
         .input-titanium { 
             width: 100%; background: #080808; border: 1px solid var(--border); color: #fff; 
             padding: 12px; font-family: var(--font-mono); margin-top: 5px; outline: none; border-radius: 4px;
         }
-        .input-titanium:focus { border-color: var(--accent); }
 
         .btn-upload {
             width: 100%; background: #222; border: 1px dashed #666; color: #fff; padding: 15px; 
             cursor: pointer; margin-bottom: 10px; display: flex; justify-content: center; gap: 10px;
             font-family: var(--font-mono); font-size: 0.75rem; transition: 0.2s;
         }
-        .btn-upload:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
 
-        .color-wrapper { display: flex; align-items: center; gap: 10px; background: #080808; border: 1px solid var(--border); padding: 5px; border-radius: 4px; }
-        input[type="color"] { background: none; border: none; height: 30px; width: 30px; cursor: pointer; }
-
-        .action-bar { padding: 20px; border-bottom: 1px solid var(--border); display: flex; gap: 10px; }
-        .sys-btn { 
-            flex: 1; background: #111; border: 1px solid var(--border); color: #888; 
-            padding: 10px; border-radius: 4px; cursor: pointer; display: flex; justify-content: center; align-items: center; 
-        }
-        .sys-btn:hover { color: #fff; border-color: #fff; }
-        .sys-btn.primary { background: var(--accent); color: #000; border: none; font-weight: bold; }
-        .sys-btn.primary:hover { box-shadow: 0 0 20px var(--accent-dim); }
-
-        /* RESIZERS */
-        .resizer { position: absolute; width: 10px; height: 10px; background: var(--accent); z-index: 20; display: none; }
+        /* RESIZERS (TOUCH FRIENDLY) */
+        .resizer { position: absolute; width: 20px; height: 20px; background: var(--accent); z-index: 20; display: none; border-radius: 50%; border: 2px solid #000; }
         .element.selected .resizer { display: block; }
-        .resizer.nw { top: -5px; left: -5px; cursor: nw-resize; }
-        .resizer.ne { top: -5px; right: -5px; cursor: ne-resize; }
-        .resizer.sw { bottom: -5px; left: -5px; cursor: sw-resize; }
-        .resizer.se { bottom: -5px; right: -5px; cursor: se-resize; }
+        .resizer.nw { top: -10px; left: -10px; }
+        .resizer.ne { top: -10px; right: -10px; }
+        .resizer.sw { bottom: -10px; left: -10px; }
+        .resizer.se { bottom: -10px; right: -10px; }
 
         /* MOBILE RESPONSIVENESS */
         @media (max-width: 768px) {
@@ -186,80 +171,76 @@
                 position: fixed; top: 60px; right: 0; bottom: 0; width: 85%; 
                 transform: translateX(100%); box-shadow: -10px 0 30px rgba(0,0,0,0.5);
             }
-            
             .mobile-open { transform: translateX(0); }
             .canvas-header { display: none; } 
-            .drop-zone { margin: 10px; min-height: 80vh; }
+            .drop-zone { margin: 10px; min-height: 80vh; max-width: 100%; border: none; }
         }
 
-        /* MODALS */
+        /* UTILS */
+        .page-item { padding: 10px; border: 1px solid #333; margin-bottom: 5px; cursor: pointer; font-family: var(--font-mono); font-size: 0.8rem; display: flex; align-items: center; gap: 10px; }
+        .page-item.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 200; display: none; justify-content: center; align-items: center; }
-        .modal-box { width: 90%; max-width: 600px; background: #111; padding: 30px; border: 1px solid var(--border); box-shadow: 0 0 50px rgba(0,243,255,0.1); }
-        .modal-header { display: flex; justify-content: space-between; color: #fff; font-family: var(--font-mono); margin-bottom: 20px; }
-        .close-modal { background: none; border: none; color: #666; font-size: 1.5rem; cursor: pointer; }
+        .modal-box { width: 90%; max-width: 600px; background: #111; padding: 30px; border: 1px solid var(--border); }
         .chart-container { height: 300px; width: 100%; }
-
+        
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-<!-- /// 0. ASSET INGESTION CONDUIT (HIDDEN) /// -->
-<input type="file" id="global-upload" hidden accept="image/*,video/*">
+<!-- /// 0. ASSET INGESTION CONDUIT /// -->
+<input type="file" id="media-upload-input" hidden accept="image/*">
 
 <div class="interface-wrapper">
     
-    <!-- MOBILE COMMAND DECK -->
     <div class="mobile-nav">
         <button onclick="toggleSidebar('left')"><i data-lucide="menu"></i> TOOLS</button>
         <div class="brand-mobile">NMV_BUILDER</div>
         <button onclick="toggleSidebar('right')"><i data-lucide="settings-2"></i> EDIT</button>
     </div>
 
-    <!-- /// 1. LEFT: THE ARMORY (TOOLS) /// -->
+    <!-- /// 1. LEFT: THE ARMORY /// -->
     <aside class="sidebar-left" id="sidebar-left">
         <div class="brand">NMV<span class="highlight">_ARCHITECT</span></div>
         
         <div class="tab-triggers">
-            <button class="tab-btn active" onclick="switchLeftTab('tools')"><i data-lucide="layout-template"></i> ELEMENTS</button>
+            <button class="tab-btn active" onclick="switchLeftTab('tools')"><i data-lucide="layout-template"></i> TOOLS</button>
             <button class="tab-btn" onclick="switchLeftTab('pages')"><i data-lucide="files"></i> PAGES</button>
         </div>
 
         <!-- PANEL: TOOLS -->
         <div id="panel-tools" class="left-panel active">
             
-            <div class="tool-category">NAVIGATION</div>
-            <div class="draggable-item" draggable="true" data-type="header-minimal"><i data-lucide="minus"></i> HEADER_MINIMAL</div>
-            <div class="draggable-item" draggable="true" data-type="header-cyber"><i data-lucide="cpu"></i> HEADER_CYBER</div>
+            <!-- MEDIA DOCK -->
+            <div class="tool-category" style="margin-top:0;">MEDIA DOCK (MAX 10)</div>
+            <div class="media-counter"><span id="media-count">0</span>/10 SLOTS USED</div>
+            <div class="media-grid" id="media-grid">
+                <!-- Thumbnails inject here -->
+                <button class="media-thumb" style="display:flex; justify-content:center; align-items:center; border:1px dashed #666;" onclick="triggerMediaUpload()">
+                    <i data-lucide="plus"></i>
+                </button>
+            </div>
 
-            <div class="tool-category">HERO SECTIONS</div>
-            <div class="draggable-item" draggable="true" data-type="hero-clean"><i data-lucide="monitor"></i> HERO_CLEAN</div>
-            <div class="draggable-item" draggable="true" data-type="hero-matrix"><i data-lucide="code"></i> HERO_MATRIX</div>
-
-            <div class="tool-category">CONTENT BLOCKS</div>
-            <div class="draggable-item" draggable="true" data-type="text-split"><i data-lucide="columns"></i> TEXT_SPLIT</div>
-            <div class="draggable-item" draggable="true" data-type="features-grid"><i data-lucide="grid"></i> FEATURE_GRID</div>
-            
-            <div class="tool-category">MEDIA & ACTION</div>
-            <div class="draggable-item" draggable="true" data-type="image"><i data-lucide="image"></i> IMAGE_VESSEL</div>
-            <div class="draggable-item" draggable="true" data-type="video"><i data-lucide="video"></i> VIDEO_EMBED</div>
-            <div class="draggable-item" draggable="true" data-type="button-primary"><i data-lucide="mouse-pointer-2"></i> BTN_PRIMARY</div>
-            <div class="draggable-item" draggable="true" data-type="button-neon"><i data-lucide="zap"></i> BTN_NEON</div>
+            <div class="tool-category">STRUCTURES</div>
+            <div class="draggable-item" onclick="addBlock('header-minimal')"><i data-lucide="minus"></i> HEADER_MINIMAL</div>
+            <div class="draggable-item" onclick="addBlock('hero-matrix')"><i data-lucide="code"></i> HERO_MATRIX</div>
+            <div class="draggable-item" onclick="addBlock('text-split')"><i data-lucide="columns"></i> TEXT_SPLIT</div>
+            <div class="draggable-item" onclick="addBlock('image')"><i data-lucide="image"></i> IMAGE_VESSEL</div>
+            <div class="draggable-item" onclick="addBlock('button-neon')"><i data-lucide="zap"></i> BTN_NEON</div>
         </div>
 
         <!-- PANEL: PAGES -->
         <div id="panel-pages" class="left-panel">
             <div class="page-list" id="page-manager">
-                <div class="page-item active" onclick="loadPage('home')"><i data-lucide="home"></i> HOME</div>
-                <div class="page-item" onclick="loadPage('about')"><i data-lucide="file"></i> ABOUT</div>
-                <div class="page-item" onclick="loadPage('services')"><i data-lucide="briefcase"></i> SERVICES</div>
-                <div class="page-item" onclick="loadPage('contact')"><i data-lucide="mail"></i> CONTACT</div>
-                <button class="btn-upload" style="margin-top:20px;">+ NEW PAGE</button>
+                <div class="page-item active" onclick="switchPage('home')"><i data-lucide="home"></i> HOME</div>
+                <div class="page-item" onclick="switchPage('about')"><i data-lucide="file"></i> ABOUT</div>
+                <div class="page-item" onclick="switchPage('services')"><i data-lucide="briefcase"></i> SERVICES</div>
+                <div class="page-item" onclick="switchPage('contact')"><i data-lucide="mail"></i> CONTACT</div>
             </div>
         </div>
     </aside>
 
-    <!-- /// 2. CENTER: THE VOID (CANVAS) /// -->
+    <!-- /// 2. CENTER: CANVAS /// -->
     <main class="canvas-area">
         <div class="canvas-header">
             <div class="current-view">PAGE: <span id="current-page-label" class="highlight">HOME</span></div>
@@ -270,79 +251,46 @@
             <button class="btn-preview" onclick="togglePreview()">PREVIEW</button>
         </div>
         
-        <!-- DROP ZONE -->
-        <div id="workspace-container" style="flex:1; display:flex; justify-content:center; overflow-y:auto;">
+        <div id="workspace-container" style="flex:1; display:flex; justify-content:center; overflow-y:auto; -webkit-overflow-scrolling: touch;">
             <div id="workspace" class="drop-zone desktop-view">
-                <div class="placeholder-msg">/// DRAG COMPONENTS HERE TO INITIALIZE ///</div>
+                <div class="placeholder-msg">/// TAP TOOLS TO DEPLOY ///</div>
             </div>
         </div>
     </main>
 
-    <!-- /// 3. RIGHT: CONTROL MATRIX (PROPERTIES) /// -->
+    <!-- /// 3. RIGHT: PROPERTIES /// -->
     <aside class="sidebar-right" id="sidebar-right">
-        <div class="action-bar">
-            <button class="sys-btn" onclick="openAnalytics()"><i data-lucide="bar-chart-2"></i></button>
-            <button class="sys-btn" onclick="openSettings()"><i data-lucide="settings"></i></button>
-            <button class="sys-btn primary" onclick="exportSite()">DEPLOY</button>
+        <div style="padding:20px; border-bottom:1px solid #333;">
+            <button class="sys-btn primary" onclick="openAnalytics()" style="width:100%; margin-bottom:10px;">ANALYTICS</button>
+            <button class="sys-btn" onclick="exportSite()" style="width:100%;">DEPLOY SITE</button>
         </div>
 
         <div id="properties-panel" class="properties-panel">
-            <div class="panel-header">ATTRIBUTES_MATRIX</div>
-            
-            <div id="no-selection" style="text-align:center; color:#444; font-family:'Space Mono'; margin-top:50px; font-size:0.7rem;">
-                SELECT ARTIFACT TO MODIFY
-            </div>
+            <div class="tool-category">PROPERTIES</div>
+            <div id="no-selection" style="text-align:center; color:#444; font-family:'Space Mono'; margin-top:30px;">SELECT ELEMENT</div>
 
             <div id="editor-controls" style="display:none;">
-                <!-- TEXT CONTROLS -->
-                <div class="control-group" id="ctrl-text">
-                    <label style="display:block; font-size:0.6rem; color:var(--accent); margin-bottom:5px; font-family:'Space Mono';">CONTENT STRING</label>
-                    <textarea id="prop-text" class="input-titanium" rows="3"></textarea>
-                </div>
+                <label class="tool-category">TEXT CONTENT</label>
+                <textarea id="prop-text" class="input-titanium" rows="3"></textarea>
                 
-                <!-- UPLOAD CONTROLS -->
-                <div class="control-group" id="ctrl-upload" style="display:none;">
-                    <label style="display:block; font-size:0.6rem; color:var(--accent); margin-bottom:5px; font-family:'Space Mono';">MEDIA SOURCE</label>
-                    <button class="btn-upload" onclick="triggerUpload()">UPLOAD FILE <i data-lucide="upload"></i></button>
-                    <input type="text" id="prop-src" class="input-titanium" placeholder="OR PASTE URL">
-                </div>
+                <label class="tool-category" style="margin-top:20px;">BACKGROUND</label>
+                <input type="color" id="prop-color" style="width:100%; height:40px; background:none; border:1px solid #333;">
 
-                <!-- GLOBAL STYLES -->
-                <div class="control-group" style="margin-top:20px;">
-                    <label style="display:block; font-size:0.6rem; color:var(--accent); margin-bottom:5px; font-family:'Space Mono';">BACKGROUND FREQUENCY</label>
-                    <div class="color-wrapper">
-                        <input type="color" id="prop-color">
-                    </div>
-                </div>
+                <label class="tool-category" style="margin-top:20px;">PADDING</label>
+                <input type="range" id="prop-padding" min="0" max="100" style="width:100%;">
 
-                <div class="control-group" style="margin-top:20px;">
-                    <label style="display:block; font-size:0.6rem; color:var(--accent); margin-bottom:5px; font-family:'Space Mono';">PADDING (Y-AXIS)</label>
-                    <input type="range" id="prop-padding" min="0" max="200" value="50" style="width:100%;">
-                </div>
-
-                <button class="btn-upload" style="background:rgba(255,0,0,0.1); color:red; border-color:red; margin-top:30px;" onclick="deleteSelected()">INCINERATE</button>
+                <button class="btn-upload" style="margin-top:30px; border-color:red; color:red;" onclick="deleteSelected()">DELETE BLOCK</button>
             </div>
         </div>
     </aside>
 
 </div>
 
-<!-- /// 4. MODAL OVERLAYS /// -->
 <div id="modal-analytics" class="modal-overlay">
     <div class="modal-box">
-        <div class="modal-header"><h3>REAL-TIME_ANALYTICS</h3><button class="close-modal" onclick="closeModal('modal-analytics')">X</button></div>
+        <h3 style="font-family:'Space Mono'; margin-bottom:20px;">TRAFFIC_FLUX</h3>
         <div class="chart-container"><canvas id="trafficChart"></canvas></div>
-    </div>
-</div>
-
-<div id="modal-settings" class="modal-overlay">
-    <div class="modal-box">
-        <div class="modal-header"><h3>DOMAIN_CONTROLLER</h3><button class="close-modal" onclick="closeModal('modal-settings')">X</button></div>
-        <div class="settings-form">
-            <label style="color:#666; font-size:0.7rem; font-family:'Space Mono';">PRIMARY DOMAIN</label>
-            <input type="text" value="neuralmatrixvault.com" class="input-titanium" readonly>
-            <button class="sys-btn primary" style="width:100%; margin-top:20px;">UPDATE_DNS_RECORDS</button>
-        </div>
+        <button class="btn-upload" onclick="closeModal('modal-analytics')">CLOSE</button>
     </div>
 </div>
 
@@ -350,4 +298,4 @@
 <script>lucide.createIcons();</script>
 <script src="defense.js"></script>
 </body>
-                    </html>
+</html>
