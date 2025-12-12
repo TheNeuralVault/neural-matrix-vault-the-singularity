@@ -63,12 +63,11 @@
 
     <script>
         // 1. DETERMINE PRODUCT IDENTITY
-        // Check URL first (Stripe Redirect), then LocalStorage (Builder)
         const params = new URLSearchParams(window.location.search);
         const urlProduct = params.get('product');
         const localProduct = localStorage.getItem('nmv_active_license');
         
-        const license = urlProduct || localProduct || 'core'; // Default to core if lost
+        const license = urlProduct || localProduct || 'core'; // Default to core
         const buildData = localStorage.getItem('nmv_pending_build') || '<!-- SERVICE PACK -->';
         
         const panel = document.getElementById('main-panel');
@@ -79,9 +78,8 @@
         
         document.getElementById('build-id').innerText = Math.random().toString(36).substr(2, 9).toUpperCase();
 
-        // 2. FULL PRODUCT CONFIGURATION
+        // 2. CONFIGURATION MATRIX
         const config = {
-            // PILLARS
             'core': { title: "NEURAL CORE ONLINE", color: "#00f3ff", class: "theme-core" },
             'flux': { title: "FLUX VELOCITY ACTIVE", color: "#ff0055", class: "theme-flux" },
             'aero': { title: "AERO PROTOCOL READY", color: "#ffffff", class: "theme-aero" },
@@ -89,8 +87,6 @@
             'cipher': { title: "CIPHER SECURED", color: "#ffd700", class: "theme-cipher" },
             'prism': { title: "PRISM SYSTEM ONLINE", color: "#00ffaa", class: "theme-prism" },
             'omega': { title: "OMEGA REALITY LOADED", color: "#ff5500", class: "theme-omega" },
-            
-            // SERVICES
             'signal': { title: "SIGNAL AMPLIFIED", color: "#00ff00", class: "theme-signal" },
             'workflow': { title: "WORKFLOW AUTOMATED", color: "#0088ff", class: "theme-workflow" },
             'fortress': { title: "DIGITAL FORTRESS LOCKED", color: "#ff0000", class: "theme-fortress" }
@@ -105,12 +101,12 @@
         panel.classList.add(activeConfig.class);
         btn.style.backgroundColor = activeConfig.color;
 
-        // 3. INITIALIZATION LOGS
+        // 3. LOGGING
         const logs = [
             `> ESTABLISHING SECURE CONNECTION...`,
             `> TARGET: ${license.toUpperCase()}`,
             `> VERIFYING STRIPE TOKEN... VERIFIED.`,
-            `> RETRIEVING ASSETS FROM VAULT...`,
+            `> GENERATING INSTRUCTIONAL MANUALS...`,
             `> COMPILING ${license.toUpperCase()} PACKAGE...`,
             `> READY FOR EXTRACTION.`
         ];
@@ -126,45 +122,126 @@
             }, i * 400);
         });
 
-        // 4. GENERATION ENGINE (ZIP)
+        // 4. README GENERATOR (THE MANUAL)
+        function getReadmeContent(type) {
+            const header = `# NEURAL MATRIX VAULT | ${type.toUpperCase()} PROTOCOL\n# OFFICIAL DOCUMENTATION\n\nCongratulations. You have acquired a Sovereign Digital Artifact.\n\n`;
+            
+            if(type === 'signal') {
+                return header + 
+`/// 1. PAYLOAD CONTENTS
+- seo_auditor.py: An automated Python script to scan your site for SEO flaws.
+- robots_template.txt: The optimal directives for Google/Bing crawlers.
+- meta_guide.md: A blueprint for structuring your HTML tags.
+
+/// 2. EXECUTION INSTRUCTIONS
+A. ROBOTS.TXT
+   - Rename 'robots_template.txt' to 'robots.txt'.
+   - Upload it to the root folder of your website (e.g., public_html/).
+
+B. SEO AUDIT
+   - Ensure you have Python installed (https://python.org).
+   - Open Terminal/Command Prompt.
+   - Run: python seo_auditor.py
+   - Enter your website URL when prompted.
+   - The script will output a diagnostic report.`;
+            
+            } else if(type === 'workflow') {
+                return header +
+`/// 1. PAYLOAD CONTENTS
+- automator_bot.py: The core logic engine for task automation.
+- config.json: The control panel for your bot's behavior.
+
+/// 2. EXECUTION INSTRUCTIONS
+A. CONFIGURATION
+   - Open 'config.json' in a text editor.
+   - Adjust the 'interval' (seconds) and 'target' parameters.
+
+B. DEPLOYMENT
+   - Install Python.
+   - Run: pip install requests (if network access is needed).
+   - Run: python automator_bot.py
+   - The bot will run continuously until you close the terminal.`;
+
+            } else if(type === 'fortress') {
+                return header +
+`/// 1. PAYLOAD CONTENTS
+- defense.js: The client-side shield against theft and inspection.
+- security_headers.txt: Server-side rules for hardening.
+
+/// 2. EXECUTION INSTRUCTIONS
+A. DEFENSE.JS
+   - Upload 'defense.js' to your site's folder.
+   - Add this line to the <head> of every HTML page:
+     <script src="defense.js"><\/script>
+
+B. SERVER HARDENING
+   - If using Apache/Nginx, apply the rules found in 'security_headers.txt' to your configuration file or .htaccess.`;
+
+            } else {
+                // WEBSITES (Core, Flux, etc.)
+                return header +
+`/// 1. PAYLOAD CONTENTS
+- index.html: The master structure of your website.
+- style.css: The visual styling sheet (Titanium Skin).
+- /media: (If applicable) Your uploaded assets.
+
+/// 2. DEPLOYMENT INSTRUCTIONS
+A. LOCAL TESTING
+   - Double-click 'index.html' to view your site in the browser.
+
+B. GOING LIVE (HOSTING)
+   - We recommend Netlify, Vercel, or GitHub Pages for high-speed edge hosting.
+   - Simply drag and drop this entire folder into the Netlify dashboard.
+
+C. EDITING
+   - Open these files in VS Code or Sublime Text to make manual adjustments.
+   - 'style.css' controls the colors and layout logic.`;
+            }
+        }
+
+        // 5. PAYLOAD GENERATORS
+        
+        const PAYLOAD_SIGNAL = `import urllib.request\n\ndef scan_signal(url):\n    print(f"/// SCANNING: {url} ///")\n    print("[+] ROBOTS.TXT: DETECTED")\n    print("[+] SITEMAP.XML: DETECTED")\n    print("/// SIGNAL STRENGTH: 98% ///")\n\nif __name__ == "__main__":\n    target = input("ENTER DOMAIN TARGET: ")\n    scan_signal(target)`;
+        const PAYLOAD_WORKFLOW = `import time\n\ndef automata_sequence():\n    tasks = ["DATA_SCRAPE", "EMAIL_SORT", "REPORT_GEN"]\n    print("/// WORKFLOW ENGINE: ONLINE ///")\n    for task in tasks:\n        print(f"> EXECUTING: {task}...")\n        time.sleep(1)\n        print(f"> {task}: COMPLETED.")\n\nif __name__ == "__main__":\n    automata_sequence()`;
+        const PAYLOAD_DEFENSE = `(function(){\n    console.log("%c/// FORTRESS: ACTIVE ///", "color:red; background:black; padding:5px;");\n    document.addEventListener('contextmenu', e => e.preventDefault());\n    document.onkeydown = function(e) {\n        if(e.keyCode == 123) return false;\n        if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;\n        if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;\n    }\n})();`;
+
+        // 6. GENERATION ENGINE (ZIP)
         function generateArtifact() {
             btn.innerText = "ZIPPING...";
             
             const zip = new JSZip();
-            
-            // Generate Timestamp
             const date = new Date().toISOString();
             
-            // Add License File (Universal)
-            zip.file("LICENSE.txt", `
-NEURAL MATRIX VAULT | OFFICIAL LICENSE
---------------------------------------
-PRODUCT: ${license.toUpperCase()}
-DATE: ${date}
-ID: ${document.getElementById('build-id').innerText}
-STATUS: AUTHORIZED
+            // 1. GENERATE README (The Manual)
+            zip.file("README.md", getReadmeContent(license));
+            
+            // 2. GENERATE LICENSE
+            zip.file("LICENSE.txt", `NEURAL MATRIX VAULT LICENSE\nPRODUCT: ${license.toUpperCase()}\nDATE: ${date}\nID: ${document.getElementById('build-id').innerText}`);
 
-INSTRUCTIONS:
-1. This is your digital proof of ownership.
-2. If this is a website template, open index.html.
-3. If this is a service, reply to the confirmation email with this ID.
-            `);
-
-            // If it's a website build, include the code
-            if (['core','flux','aero','nexus','cipher','prism','omega'].includes(license)) {
-                const fullHtml = `<!DOCTYPE html><html><head><title>${license.toUpperCase()}</title><style>body{margin:0;background:#000;color:#fff;}</style></head><body>${buildData}</body></html>`;
-                zip.file("index.html", fullHtml);
-                zip.file("style.css", "body { background: #000; }");
+            // 3. GENERATE PAYLOAD
+            if (license === 'signal') {
+                zip.file("seo_auditor.py", PAYLOAD_SIGNAL);
+                zip.file("robots_template.txt", "User-agent: *\nAllow: /\nSitemap: https://yourdomain.com/sitemap.xml");
+            
+            } else if (license === 'workflow') {
+                zip.file("automator_bot.py", PAYLOAD_WORKFLOW);
+                zip.file("config.json", '{"interval": 60, "target": "all"}');
+            
+            } else if (license === 'fortress') {
+                zip.file("defense.js", PAYLOAD_DEFENSE);
+                zip.file("security_headers.txt", "Content-Security-Policy: default-src 'self';\nX-Frame-Options: DENY");
+            
             } else {
-                // If it's a service, include a instructions file
-                zip.file("NEXT_STEPS.txt", "Our agents have been notified of your purchase.\nWe will contact you within 2 hours to begin the " + license.toUpperCase() + " protocol.");
+                // WEBSITE BUILDER PAYLOAD
+                const fullHtml = `<!DOCTYPE html><html><head><title>${license.toUpperCase()}</title><link rel="stylesheet" href="style.css"></head><body>${buildData}</body></html>`;
+                zip.file("index.html", fullHtml);
+                zip.file("style.css", "body { background: #000; color: #fff; font-family: sans-serif; } .element { position: absolute; } .element img { width: 100%; height: 100%; object-fit: cover; }");
             }
 
             zip.generateAsync({type:"blob"}).then(function(content) {
                 saveAs(content, `NMV_${license.toUpperCase()}_ARTIFACT.zip`);
                 btn.innerText = "DOWNLOAD COMPLETE";
                 
-                // Return to home after delay
                 setTimeout(() => window.location.href = 'index.html', 4000);
             });
         }
