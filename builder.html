@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEURAL CONSTRUCTOR | v2.0</title>
+    <title>NEURAL CONSTRUCTOR | v3.0</title>
     <link rel="stylesheet" href="builder.css">
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;500;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -11,19 +11,19 @@
 </head>
 <body>
 
-<!-- HIDDEN UPLOAD INPUT -->
+<!-- /// 0. ASSET INGESTION CONDUIT (HIDDEN) /// -->
 <input type="file" id="global-upload" hidden accept="image/*,video/*">
 
 <div class="interface-wrapper">
     
-    <!-- MOBILE HEADER -->
+    <!-- MOBILE COMMAND DECK -->
     <div class="mobile-nav">
         <button onclick="toggleSidebar('left')"><i data-lucide="menu"></i> TOOLS</button>
         <div class="brand-mobile">NMV_BUILDER</div>
         <button onclick="toggleSidebar('right')"><i data-lucide="settings-2"></i> EDIT</button>
     </div>
 
-    <!-- LEFT: TOOLBOX -->
+    <!-- /// 1. LEFT: THE ARMORY (TOOLS) /// -->
     <aside class="sidebar-left" id="sidebar-left">
         <div class="brand">NMV<span class="highlight">_ARCHITECT</span></div>
         
@@ -66,7 +66,7 @@
         </div>
     </aside>
 
-    <!-- CENTER: CANVAS -->
+    <!-- /// 2. CENTER: THE VOID (CANVAS) /// -->
     <main class="canvas-area">
         <div class="canvas-header">
             <div class="current-view">PAGE: <span id="current-page-label" class="highlight">HOME</span></div>
@@ -80,12 +80,12 @@
         <!-- DROP ZONE -->
         <div id="workspace-container">
             <div id="workspace" class="drop-zone desktop-view">
-                <div class="placeholder-msg">/// INITIATE ARCHITECTURE HERE ///</div>
+                <div class="placeholder-msg">/// DRAG COMPONENTS HERE TO INITIALIZE ///</div>
             </div>
         </div>
     </main>
 
-    <!-- RIGHT: PROPERTIES -->
+    <!-- /// 3. RIGHT: CONTROL MATRIX (PROPERTIES) /// -->
     <aside class="sidebar-right" id="sidebar-right">
         <div class="action-bar">
             <button class="sys-btn" onclick="openAnalytics()"><i data-lucide="bar-chart-2"></i></button>
@@ -99,18 +99,20 @@
             <div id="no-selection" class="info-msg">SELECT ARTIFACT TO MODIFY</div>
 
             <div id="editor-controls" style="display:none;">
-                <!-- DYNAMICALLY FILLED CONTROLS -->
+                <!-- TEXT CONTROLS (CONTEXT AWARE) -->
                 <div class="control-group" id="ctrl-text">
                     <label>CONTENT STRING</label>
                     <textarea id="prop-text" class="input-titanium" rows="3"></textarea>
                 </div>
                 
+                <!-- UPLOAD CONTROLS (CONTEXT AWARE) -->
                 <div class="control-group" id="ctrl-upload" style="display:none;">
                     <label>MEDIA SOURCE</label>
                     <button class="btn-upload" onclick="triggerUpload()">UPLOAD FILE <i data-lucide="upload"></i></button>
                     <input type="text" id="prop-src" class="input-titanium" placeholder="OR PASTE URL">
                 </div>
 
+                <!-- GLOBAL STYLES -->
                 <div class="control-group">
                     <label>BACKGROUND FREQUENCY</label>
                     <div class="color-wrapper">
@@ -131,13 +133,14 @@
 
 </div>
 
-<!-- MODALS (SAME AS BEFORE) -->
+<!-- /// 4. MODAL OVERLAYS /// -->
 <div id="modal-analytics" class="modal-overlay">
     <div class="modal-box">
         <div class="modal-header"><h3>REAL-TIME_ANALYTICS</h3><button onclick="closeModal('modal-analytics')">X</button></div>
         <div class="chart-container"><canvas id="trafficChart"></canvas></div>
     </div>
 </div>
+
 <div id="modal-settings" class="modal-overlay">
     <div class="modal-box">
         <div class="modal-header"><h3>DOMAIN_CONTROLLER</h3><button onclick="closeModal('modal-settings')">X</button></div>
@@ -148,6 +151,7 @@
     </div>
 </div>
 
+<!-- /// 5. ENGINES /// -->
 <script src="builder.js"></script>
 <script>lucide.createIcons();</script>
 <!-- SECURITY -->
