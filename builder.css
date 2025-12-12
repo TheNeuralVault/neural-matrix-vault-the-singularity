@@ -1,114 +1,38 @@
-/* TITANIUM BUILDER CSS v2.5 */
+/* /// DIMENSIONAL GIZMO (RESIZER) /// */
 
-:root {
-    --bg-void: #020202;
-    --bg-panel: rgba(10, 10, 10, 0.95);
-    --border: #333;
-    --accent: #00f3ff;
-    --font-head: 'Outfit', sans-serif;
-    --font-mono: 'Space Mono', monospace;
+/* The Selection Box */
+.element.selected {
+    outline: 2px solid var(--accent);
+    z-index: 100;
+    cursor: move; /* Indicates drag capability */
 }
 
-body { margin: 0; background: var(--bg-void); color: #fff; font-family: var(--font-head); overflow: hidden; }
-* { box-sizing: border-box; user-select: none; }
-
-.interface-wrapper { display: flex; height: 100vh; width: 100%; position: relative; }
-
-/* MOBILE NAV (Hidden on Desktop) */
-.mobile-nav { 
-    display: none; 
-    height: 50px; background: #111; border-bottom: 1px solid var(--border);
-    justify-content: space-between; align-items: center; padding: 0 15px;
-    position: fixed; top: 0; left: 0; width: 100%; z-index: 50;
-}
-.mobile-nav button { background: none; border: none; color: #fff; display: flex; gap: 5px; align-items: center; }
-.brand-mobile { font-family: var(--font-mono); color: var(--accent); font-weight: bold; }
-
-/* SIDEBARS */
-.sidebar-left, .sidebar-right { 
-    width: 300px; background: var(--bg-panel); border-right: 1px solid var(--border); 
-    display: flex; flex-direction: column; z-index: 40; transition: transform 0.3s ease;
-}
-.sidebar-right { border-left: 1px solid var(--border); border-right: none; }
-
-/* CANVAS */
-.canvas-area { 
-    flex: 1; background: #080808; display: flex; flex-direction: column; 
-    background-image: radial-gradient(#222 1px, transparent 1px); background-size: 20px 20px;
-}
-.canvas-header { 
-    height: 60px; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.8); 
-    display: flex; justify-content: space-between; align-items: center; padding: 0 20px;
+/* The Resize Handles */
+.resizer {
+    width: 10px;
+    height: 10px;
+    background: var(--accent);
+    position: absolute;
+    border: 1px solid #000;
+    z-index: 101;
+    display: none; /* Hidden by default, shown on select */
 }
 
-.drop-zone { 
-    flex: 1; margin: 30px; background: #fff; border-radius: 4px; overflow-y: auto; 
-    box-shadow: 0 0 50px rgba(0,0,0,0.5); color: #000; position: relative; transition: 0.3s;
+.element.selected .resizer { display: block; }
+
+/* Positions */
+.resizer.se { bottom: -5px; right: -5px; cursor: se-resize; }
+.resizer.sw { bottom: -5px; left: -5px; cursor: sw-resize; }
+.resizer.ne { top: -5px; right: -5px; cursor: ne-resize; }
+.resizer.nw { top: -5px; left: -5px; cursor: nw-resize; }
+
+/* Upload Drop Zone Active State */
+.drop-zone.drag-over-file {
+    border: 2px dashed #00ff00 !important;
+    background: rgba(0, 255, 0, 0.1) !important;
 }
-.drag-over { border: 2px solid var(--accent); transform: scale(0.98); }
-
-/* COMPONENTS */
-.draggable-item { 
-    padding: 15px; border: 1px solid var(--border); margin-bottom: 10px; background: #111; 
-    border-radius: 4px; cursor: grab; display: flex; gap: 10px; align-items: center; font-size: 0.8rem; font-family: var(--font-mono);
+.drop-zone.drag-over-file::after {
+    content: '/// INGESTING ASSET ///';
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    color: #00ff00; font-family: var(--font-mono); font-weight: bold; pointer-events: none;
 }
-.draggable-item:hover { border-color: var(--accent); color: var(--accent); }
-
-.tool-category { 
-    font-size: 0.6rem; color: #666; margin: 20px 0 10px 0; font-family: var(--font-mono); font-weight: bold; 
-}
-
-/* CANVAS ELEMENTS */
-.element { position: relative; transition: 0.2s; }
-.element:hover { outline: 2px solid rgba(0,243,255,0.3); cursor: pointer; }
-.element.selected { outline: 2px solid var(--accent); z-index: 10; }
-
-/* PROPERTIES */
-.properties-panel { padding: 20px; overflow-y: auto; }
-.input-titanium { 
-    width: 100%; background: #000; border: 1px solid var(--border); color: #fff; 
-    padding: 10px; font-family: var(--font-mono); margin-top: 5px; outline: none; 
-}
-.btn-upload {
-    width: 100%; background: #222; border: 1px dashed #666; color: #fff; padding: 15px; 
-    cursor: pointer; margin-bottom: 10px; display: flex; justify-content: center; gap: 10px;
-}
-.btn-upload:hover { border-color: var(--accent); color: var(--accent); }
-
-/* TABS */
-.tab-triggers { display: flex; border-bottom: 1px solid var(--border); }
-.tab-btn { flex: 1; padding: 15px; background: none; border: none; color: #666; cursor: pointer; font-family: var(--font-mono); font-size: 0.7rem; }
-.tab-btn.active { color: var(--accent); background: rgba(0,243,255,0.05); }
-
-/* PREVIEW TOGGLE */
-.preview-active .sidebar-left, .preview-active .sidebar-right, .preview-active .canvas-header { display: none; }
-.preview-active .drop-zone { margin: 0; height: 100vh; }
-
-/* --- MOBILE RESPONSIVENESS --- */
-@media (max-width: 768px) {
-    .interface-wrapper { flex-direction: column; padding-top: 50px; }
-    .mobile-nav { display: flex; }
-    
-    .sidebar-left { 
-        position: fixed; top: 50px; left: 0; bottom: 0; width: 80%; 
-        transform: translateX(-100%); 
-    }
-    .sidebar-right { 
-        position: fixed; top: 50px; right: 0; bottom: 0; width: 80%; 
-        transform: translateX(100%); 
-    }
-    
-    .mobile-open { transform: translateX(0); }
-    
-    .canvas-header { display: none; } /* Simplify mobile view */
-    .drop-zone { margin: 10px; }
-    
-    .placeholder-msg { font-size: 0.8rem; text-align: center; }
-}
-
-/* UTILS */
-.page-item { padding: 10px; cursor: pointer; font-family: var(--font-mono); color: #888; display: flex; gap: 10px; }
-.page-item.active { color: var(--accent); }
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; display: none; justify-content: center; align-items: center; }
-.modal-box { width: 90%; max-width: 600px; background: #111; padding: 30px; border: 1px solid var(--border); }
-.modal-header { display: flex; justify-content: space-between; color: #fff; font-family: var(--font-mono); margin-bottom: 20px; }
