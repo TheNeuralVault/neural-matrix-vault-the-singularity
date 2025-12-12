@@ -5,38 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ACQUISITION CONFIRMED | NMV</title>
     
-    <!-- JSZIP LIBRARIES FOR CLIENT-SIDE GENERATION -->
+    <!-- JSZIP LIBRARIES -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 
+    <!-- /// TITANIUM SKIN /// -->
     <style>
         body { background: #000; color: #fff; font-family: 'Courier New', monospace; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
         .glass-panel { width: 90%; max-width: 600px; background: rgba(10,10,10,0.9); border: 1px solid #333; padding: 40px; text-align: center; position: relative; box-shadow: 0 0 100px rgba(0,243,255,0.1); }
         
-        h1 { color: #fff; margin-bottom: 10px; font-size: 2rem; letter-spacing: -1px; }
+        h1 { color: #fff; margin-bottom: 10px; font-size: 2rem; letter-spacing: -1px; text-transform: uppercase; }
         .sub-text { color: #888; font-size: 0.8rem; margin-bottom: 30px; }
         
-        .status-box { background: #111; border: 1px solid #333; padding: 20px; margin-bottom: 30px; text-align: left; }
-        .log-line { font-size: 0.75rem; color: #00ff00; margin-bottom: 5px; opacity: 0; animation: typeIn 0.5s forwards; }
+        .status-box { background: #111; border: 1px solid #333; padding: 20px; margin-bottom: 30px; text-align: left; height: 150px; overflow-y: auto; }
+        .log-line { font-size: 0.75rem; color: #00ff00; margin-bottom: 5px; opacity: 0; animation: typeIn 0.5s forwards; font-family: 'Courier New', monospace; }
         
-        .btn-download { background: #00f3ff; color: #000; border: none; padding: 15px 40px; font-weight: bold; font-size: 1rem; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; transition: 0.3s; opacity: 0; animation: fadeIn 1s 2s forwards; }
+        .btn-download { background: #00f3ff; color: #000; border: none; padding: 15px 40px; font-weight: bold; font-size: 1rem; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; transition: 0.3s; opacity: 0; animation: fadeIn 1s 2s forwards; text-decoration: none; }
         .btn-download:hover { box-shadow: 0 0 20px #00f3ff; transform: scale(1.05); }
 
         @keyframes typeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
         @keyframes fadeIn { to { opacity: 1; } }
         
         /* DYNAMIC THEMES */
-        .theme-core { border-color: #00f3ff; }
-        .theme-flux { border-color: #ff0055; }
-        .theme-signal { border-color: #00ff00; }
-        .theme-fortress { border-color: #ffd700; }
+        .theme-core { border-color: #00f3ff; box-shadow: 0 0 50px rgba(0,243,255,0.2); }
+        .theme-flux { border-color: #ff0055; box-shadow: 0 0 50px rgba(255,0,85,0.2); }
+        .theme-aero { border-color: #ffffff; box-shadow: 0 0 50px rgba(255,255,255,0.2); }
+        .theme-nexus { border-color: #bc13fe; box-shadow: 0 0 50px rgba(188,19,254,0.2); }
+        .theme-cipher { border-color: #ffd700; box-shadow: 0 0 50px rgba(255,215,0,0.2); }
+        .theme-prism { border-color: #00ffaa; box-shadow: 0 0 50px rgba(0,255,170,0.2); }
+        .theme-omega { border-color: #ff5500; box-shadow: 0 0 50px rgba(255,85,0,0.2); }
+        
+        .theme-signal { border-color: #00ff00; box-shadow: 0 0 50px rgba(0,255,0,0.2); }
+        .theme-workflow { border-color: #0088ff; box-shadow: 0 0 50px rgba(0,136,255,0.2); }
+        .theme-fortress { border-color: #ff0000; box-shadow: 0 0 50px rgba(255,0,0,0.2); }
     </style>
 </head>
 <body>
 
     <div class="glass-panel" id="main-panel">
-        <i data-lucide="check-circle" style="color:#00ff00; width:50px; height:50px; margin-bottom:20px;"></i>
+        <i data-lucide="check-circle" id="status-icon" style="color:#00ff00; width:50px; height:50px; margin-bottom:20px;"></i>
         <h1 id="welcome-title">ACCESS GRANTED</h1>
         <div class="sub-text">PAYMENT VERIFIED ON BLOCKCHAIN</div>
 
@@ -44,31 +52,48 @@
             <!-- LOGS WILL INJECT HERE -->
         </div>
 
-        <button class="btn-download" onclick="generateArtifact()">
+        <button class="btn-download" onclick="generateArtifact()" id="dl-btn">
             <i data-lucide="download"></i> DOWNLOAD ARTIFACT
         </button>
         
         <div style="margin-top:20px; font-size:0.6rem; color:#444;">
-            BUILD ID: <span id="build-id">UNKNOWN</span>
+            LICENSE ID: <span id="build-id">UNKNOWN</span>
         </div>
     </div>
 
     <script>
-        // 1. READ TELEPATHY DATA
-        const license = localStorage.getItem('nmv_active_license') || 'core'; // Default to core if unknown
-        const buildData = localStorage.getItem('nmv_pending_build') || '<!-- NO DATA FOUND -->';
+        // 1. DETERMINE PRODUCT IDENTITY
+        // Check URL first (Stripe Redirect), then LocalStorage (Builder)
+        const params = new URLSearchParams(window.location.search);
+        const urlProduct = params.get('product');
+        const localProduct = localStorage.getItem('nmv_active_license');
+        
+        const license = urlProduct || localProduct || 'core'; // Default to core if lost
+        const buildData = localStorage.getItem('nmv_pending_build') || '<!-- SERVICE PACK -->';
+        
         const panel = document.getElementById('main-panel');
         const log = document.getElementById('status-log');
         const title = document.getElementById('welcome-title');
+        const btn = document.getElementById('dl-btn');
+        const icon = document.getElementById('status-icon');
         
-        document.getElementById('build-id').innerText = Date.now().toString(36).toUpperCase();
+        document.getElementById('build-id').innerText = Math.random().toString(36).substr(2, 9).toUpperCase();
 
-        // 2. CONFIGURE THEME BASED ON PRODUCT
+        // 2. FULL PRODUCT CONFIGURATION
         const config = {
+            // PILLARS
             'core': { title: "NEURAL CORE ONLINE", color: "#00f3ff", class: "theme-core" },
             'flux': { title: "FLUX VELOCITY ACTIVE", color: "#ff0055", class: "theme-flux" },
+            'aero': { title: "AERO PROTOCOL READY", color: "#ffffff", class: "theme-aero" },
+            'nexus': { title: "NEXUS STREAM LIVE", color: "#bc13fe", class: "theme-nexus" },
+            'cipher': { title: "CIPHER SECURED", color: "#ffd700", class: "theme-cipher" },
+            'prism': { title: "PRISM SYSTEM ONLINE", color: "#00ffaa", class: "theme-prism" },
+            'omega': { title: "OMEGA REALITY LOADED", color: "#ff5500", class: "theme-omega" },
+            
+            // SERVICES
             'signal': { title: "SIGNAL AMPLIFIED", color: "#00ff00", class: "theme-signal" },
-            'fortress': { title: "FORTRESS SECURED", color: "#ffd700", class: "theme-fortress" }
+            'workflow': { title: "WORKFLOW AUTOMATED", color: "#0088ff", class: "theme-workflow" },
+            'fortress': { title: "DIGITAL FORTRESS LOCKED", color: "#ff0000", class: "theme-fortress" }
         };
 
         const activeConfig = config[license] || config['core'];
@@ -76,14 +101,17 @@
         // Apply Visuals
         title.innerText = activeConfig.title;
         title.style.color = activeConfig.color;
+        icon.style.color = activeConfig.color;
         panel.classList.add(activeConfig.class);
+        btn.style.backgroundColor = activeConfig.color;
 
-        // 3. RUN INITIALIZATION LOGS
+        // 3. INITIALIZATION LOGS
         const logs = [
-            `> CONNECTING TO ${license.toUpperCase()} SERVER...`,
-            `> VERIFYING STRIPE TOKEN... OK.`,
-            `> RETRIEVING ARCHITECTURE FROM CACHE...`,
-            `> COMPILING ASSETS...`,
+            `> ESTABLISHING SECURE CONNECTION...`,
+            `> TARGET: ${license.toUpperCase()}`,
+            `> VERIFYING STRIPE TOKEN... VERIFIED.`,
+            `> RETRIEVING ASSETS FROM VAULT...`,
+            `> COMPILING ${license.toUpperCase()} PACKAGE...`,
             `> READY FOR EXTRACTION.`
         ];
 
@@ -91,39 +119,53 @@
             setTimeout(() => {
                 const p = document.createElement('div');
                 p.className = 'log-line';
+                p.style.color = activeConfig.color;
                 p.innerText = text;
                 log.appendChild(p);
+                log.scrollTop = log.scrollHeight;
             }, i * 400);
         });
 
-        // 4. GENERATION ENGINE
+        // 4. GENERATION ENGINE (ZIP)
         function generateArtifact() {
-            const btn = document.querySelector('.btn-download');
             btn.innerText = "ZIPPING...";
             
             const zip = new JSZip();
             
-            // CONSTRUCT THE WEBSITE
-            const fullHtml = `
-<!DOCTYPE html>
-<html>
-<head>
-    <title>NEURAL EXPORT</title>
-    <style>body{margin:0; background:#000; color:#fff; font-family:sans-serif;}</style>
-</head>
-<body>
-    ${buildData}
-</body>
-</html>`;
+            // Generate Timestamp
+            const date = new Date().toISOString();
+            
+            // Add License File (Universal)
+            zip.file("LICENSE.txt", `
+NEURAL MATRIX VAULT | OFFICIAL LICENSE
+--------------------------------------
+PRODUCT: ${license.toUpperCase()}
+DATE: ${date}
+ID: ${document.getElementById('build-id').innerText}
+STATUS: AUTHORIZED
 
-            zip.file("index.html", fullHtml);
-            zip.file("style.css", "body { background: #000; }");
-            zip.file("LICENSE.txt", `AUTHORIZED FOR: ${license.toUpperCase()}\nDATE: ${new Date().toISOString()}`);
+INSTRUCTIONS:
+1. This is your digital proof of ownership.
+2. If this is a website template, open index.html.
+3. If this is a service, reply to the confirmation email with this ID.
+            `);
+
+            // If it's a website build, include the code
+            if (['core','flux','aero','nexus','cipher','prism','omega'].includes(license)) {
+                const fullHtml = `<!DOCTYPE html><html><head><title>${license.toUpperCase()}</title><style>body{margin:0;background:#000;color:#fff;}</style></head><body>${buildData}</body></html>`;
+                zip.file("index.html", fullHtml);
+                zip.file("style.css", "body { background: #000; }");
+            } else {
+                // If it's a service, include a instructions file
+                zip.file("NEXT_STEPS.txt", "Our agents have been notified of your purchase.\nWe will contact you within 2 hours to begin the " + license.toUpperCase() + " protocol.");
+            }
 
             zip.generateAsync({type:"blob"}).then(function(content) {
                 saveAs(content, `NMV_${license.toUpperCase()}_ARTIFACT.zip`);
                 btn.innerText = "DOWNLOAD COMPLETE";
-                setTimeout(() => window.location.href = 'index.html', 3000);
+                
+                // Return to home after delay
+                setTimeout(() => window.location.href = 'index.html', 4000);
             });
         }
         
