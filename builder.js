@@ -1,332 +1,329 @@
 /**
- * NEURAL CONSTRUCTOR v5.0 (TITANIUM EDITION)
+ * NEURAL CONSTRUCTOR v7.0 (OMNI-PHYSICS)
  * ARCHITECT: MAGNUS OPUS
- * PROTOCOLS: TOUCH PHYSICS, MULTIVERSE PAGES, PAYMENT INTERCEPT
+ * PROTOCOLS: INFINITE MEDIA, VIDEO, TOUCH & MOUSE SUPPORT
  */
 
-// /// STATE MANAGEMENT ///
 let selectedElement = null;
-let currentPage = 'home';
-let pageStates = {
-    home: '<div class="placeholder-msg">/// TAP TOOLS TO DEPLOY ///</div>',
-    about: '',
-    services: '',
-    contact: ''
-};
-let uploadedImages = []; // Stores Base64 strings
-const MAX_IMAGES = 10;
-let analyticsChart = null;
+let uploadedMedia = []; 
+let zIndexCounter = 100;
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("%c/// NEURAL PHYSICS: TOUCH ENABLED ///", "color:#00f3ff; background:#000; padding:5px;");
-    
-    // Load initial page state
-    restorePageState('home');
+    console.log("%c/// NEURAL PHYSICS: OMNI-DEVICE ACTIVE ///", "color:#00f3ff; background:#000; padding:5px;");
     
     // Listeners
     const mediaInput = document.getElementById('media-upload-input');
     if(mediaInput) mediaInput.addEventListener('change', handleMediaUpload);
     
-    document.getElementById('prop-text').addEventListener('input', updateText);
-    document.getElementById('prop-color').addEventListener('input', updateColor);
-    document.getElementById('prop-padding').addEventListener('input', updatePadding);
+    document.getElementById('prop-text').addEventListener('input', updateProps);
+    document.getElementById('prop-color').addEventListener('input', updateProps);
+    document.getElementById('prop-z').addEventListener('input', updateProps);
     
-    initAnalytics();
+    // Global deselect (Touch & Click)
+    const ws = document.getElementById('workspace');
+    ws.addEventListener('click', (e) => { if(e.target.id === 'workspace') deselectAll(); });
+    ws.addEventListener('touchstart', (e) => { if(e.target.id === 'workspace') deselectAll(); }, {passive: true});
 });
 
-// /// 1. MULTIVERSE PAGE SYSTEM (SWITCHING) ///
-
-window.switchPage = function(newPage) {
-    if (currentPage === newPage) return;
-
-    // 1. SAVE Current State
-    const workspace = document.getElementById('workspace');
-    pageStates[currentPage] = workspace.innerHTML;
-
-    // 2. UPDATE UI
-    document.querySelectorAll('.page-item').forEach(p => p.classList.remove('active'));
-    event.currentTarget.classList.add('active');
-    document.getElementById('current-page-label').innerText = newPage.toUpperCase();
-
-    // 3. LOAD New State
-    currentPage = newPage;
-    if (!pageStates[newPage] || pageStates[newPage].trim() === '') {
-        workspace.innerHTML = '<div class="placeholder-msg">/// EMPTY SECTOR ///</div>';
-    } else {
-        workspace.innerHTML = pageStates[newPage];
-    }
-
-    // 4. RE-INITIALIZE PHYSICS
-    rebindPhysics();
-    
-    // Close sidebar on mobile for better UX
-    if(window.innerWidth <= 768) toggleSidebar('left');
-};
-
-function rebindPhysics() {
-    const elements = document.querySelectorAll('.element');
-    elements.forEach(el => {
-        el.addEventListener('click', (e) => { e.stopPropagation(); selectComponent(el); });
-        if(!el.querySelector('.resizer')) injectResizers(el);
-        initResizeLogic(el);
-    });
-}
-
-function restorePageState(page) {
-    pageStates[page] = document.getElementById('workspace').innerHTML;
-}
-
-// /// 2. MEDIA DOCK PROTOCOL (UPLOAD LIMIT 10) ///
+// /// 1. INFINITE MEDIA DOCK ///
 
 window.triggerMediaUpload = function() {
-    if (uploadedImages.length >= MAX_IMAGES) {
-        alert("MEMORY FULL: MAX 10 ARTIFACTS ALLOWED.");
-        return;
-    }
     document.getElementById('media-upload-input').click();
 };
 
 function handleMediaUpload(e) {
-    const file = e.target.files[0];
-    if (!file) return;
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
 
-    const reader = new FileReader();
-    reader.onload = function(evt) {
-        const base64 = evt.target.result;
-        uploadedImages.push(base64);
-        renderThumbnail(base64, uploadedImages.length - 1);
-        document.getElementById('media-count').innerText = uploadedImages.length;
-    };
-    reader.readAsDataURL(file);
+    files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            const src = evt.target.result;
+            const type = file.type.startsWith('video/') ? 'video' : 'image';
+            uploadedMedia.push({ src, type });
+            renderThumbnail(src, type);
+        };
+        reader.readAsDataURL(file);
+    });
 }
 
-function renderThumbnail(src, index) {
+function renderThumbnail(src, type) {
     const grid = document.getElementById('media-grid');
     const thumb = document.createElement('div');
     thumb.className = 'media-thumb';
-    thumb.style.backgroundImage = `url(${src})`;
-    thumb.onclick = () => addImageToCanvas(src);
-    grid.insertBefore(thumb, grid.lastElementChild);
-}
-
-function addImageToCanvas(src) {
-    const workspace = document.getElementById('workspace');
-    const ph = workspace.querySelector('.placeholder-msg');
-    if(ph) ph.remove();
-
-    const el = document.createElement('div');
-    el.className = 'element';
-    el.style.width = '100%'; 
-    el.style.marginBottom = '10px';
-    el.innerHTML = `<img src="${src}" style="width:100%; pointer-events:none;">`;
     
-    injectResizers(el);
-    el.addEventListener('click', (e) => { e.stopPropagation(); selectComponent(el); });
-    initResizeLogic(el);
-    workspace.appendChild(el);
-    selectComponent(el);
-    
-    if(window.innerWidth <= 768) toggleSidebar('left');
-}
-
-// /// 3. COMPONENT FACTORY ///
-
-window.addBlock = function(type) {
-    const workspace = document.getElementById('workspace');
-    const ph = workspace.querySelector('.placeholder-msg');
-    if(ph) ph.remove();
-
-    const el = document.createElement('div');
-    el.className = 'element';
-    
-    let html = '';
-    switch(type) {
-        case 'header-minimal': html = `<div style="padding:20px; background:#fff; color:#000; font-weight:bold; display:flex; justify-content:space-between;"><span>BRAND</span><span>MENU</span></div>`; break;
-        case 'hero-matrix': html = `<div style="padding:50px 20px; background:#000; color:#00f3ff; text-align:center; border:1px solid #00f3ff;"><h1>WAKE UP</h1><p>The Matrix has you.</p></div>`; break;
-        case 'text-split': html = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:20px; background:#111; color:#fff;"><div><h3>TITLE</h3><p>Text here.</p></div><div style="background:#222;"></div></div>`; break;
-        case 'image': html = `<img src="https://via.placeholder.com/600x300" style="width:100%; display:block;">`; break;
-        case 'button-neon': html = `<div style="text-align:center; padding:20px;"><button style="background:transparent; border:1px solid #00f3ff; color:#00f3ff; padding:10px 20px; box-shadow:0 0 10px #00f3ff;">ACTIVATE</button></div>`; break;
+    if(type === 'video') {
+        thumb.innerHTML = '<i data-lucide="video" style="color:#fff;"></i>';
+        thumb.style.display = 'flex'; thumb.style.alignItems = 'center'; thumb.style.justifyContent = 'center';
+    } else {
+        thumb.style.backgroundImage = `url(${src})`;
     }
+    
+    thumb.onclick = () => spawnMedia(src, type);
+    grid.insertBefore(thumb, grid.firstElementChild);
+    if(window.lucide) lucide.createIcons();
+}
 
-    el.innerHTML = html;
-    injectResizers(el);
-    el.addEventListener('click', (e) => { e.stopPropagation(); selectComponent(el); });
-    initResizeLogic(el);
-    workspace.appendChild(el);
-    selectComponent(el);
+// /// 2. SPAWN LOGIC ///
 
+window.spawnMedia = function(src, type) {
+    const el = createBaseElement();
+    if(type === 'video') {
+        el.innerHTML = `<video src="${src}" controls style="width:100%; height:100%; object-fit:cover; pointer-events:auto;"></video>`;
+        el.style.width = '300px'; el.style.height = '200px';
+    } else {
+        el.innerHTML = `<img src="${src}" style="width:100%; height:100%; -webkit-user-drag: none; pointer-events:none;">`;
+        el.style.width = '200px'; el.style.height = '200px';
+    }
+    addToWorkspace(el);
+    // Auto-close sidebar on mobile
     if(window.innerWidth <= 768) toggleSidebar('left');
 };
 
-function injectResizers(el) {
-    const corners = ['nw', 'ne', 'sw', 'se'];
-    corners.forEach(c => {
-        const r = document.createElement('div');
-        r.className = `resizer ${c}`;
-        el.appendChild(r);
-    });
-}
-
-// /// 4. RESIZE PHYSICS (TOUCH & MOUSE) ///
-
-function initResizeLogic(el) {
-    const resizers = el.querySelectorAll('.resizer');
-    resizers.forEach(resizer => {
-        resizer.addEventListener('mousedown', (e) => startResize(e, el, resizer, false));
-        resizer.addEventListener('touchstart', (e) => startResize(e, el, resizer, true), {passive: false});
-    });
-}
-
-function startResize(e, el, resizer, isTouch) {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const startX = isTouch ? e.touches[0].clientX : e.clientX;
-    const startY = isTouch ? e.touches[0].clientY : e.clientY;
-    
-    const startWidth = parseInt(document.defaultView.getComputedStyle(el).width, 10);
-    const startHeight = parseInt(document.defaultView.getComputedStyle(el).height, 10);
-
-    function doResize(evt) {
-        const clientX = isTouch ? evt.touches[0].clientX : evt.clientX;
-        const clientY = isTouch ? evt.touches[0].clientY : evt.clientY;
-
-        if (resizer.classList.contains('se')) {
-            el.style.width = (startWidth + (clientX - startX)) + 'px';
-            el.style.height = (startHeight + (clientY - startY)) + 'px';
-        }
+window.spawnBlock = function(type) {
+    const el = createBaseElement();
+    switch(type) {
+        case 'text':
+            el.innerText = 'TAP TO EDIT';
+            el.style.color = '#fff'; el.style.fontSize = '1.2rem'; el.style.padding = '10px';
+            break;
+        case 'box':
+            el.style.backgroundColor = '#111'; el.style.border = '1px solid #333';
+            el.style.width = '200px'; el.style.height = '200px';
+            break;
+        case 'button':
+            el.innerHTML = '<button style="pointer-events:none; background:#00f3ff; border:none; padding:10px 20px; font-weight:bold;">ACTION</button>';
+            break;
+        case 'hero':
+            el.innerHTML = '<h1 style="font-size:2rem; margin:0;">HERO</h1><p>Subtitle</p>';
+            el.style.textAlign = 'center'; el.style.padding = '30px'; el.style.border = '1px dashed #444';
+            el.style.width = '300px';
+            break;
     }
+    addToWorkspace(el);
+    if(window.innerWidth <= 768) toggleSidebar('left');
+};
 
-    function stopResize() {
-        if(isTouch) {
-            window.removeEventListener('touchmove', doResize);
-            window.removeEventListener('touchend', stopResize);
+function createBaseElement() {
+    const el = document.createElement('div');
+    el.className = 'element';
+    // Adaptive Spawn Position (Center of current view)
+    el.style.left = (window.innerWidth <= 768) ? '50px' : '200px';
+    el.style.top = '100px';
+    el.style.zIndex = zIndexCounter++;
+    
+    initDragPhysics(el);
+    
+    // Selection (Mouse & Touch)
+    const handleSelect = (e) => { e.stopPropagation(); selectComponent(el); };
+    el.addEventListener('mousedown', handleSelect);
+    el.addEventListener('touchstart', handleSelect, {passive: true});
+
+    return el;
+}
+
+function addToWorkspace(el) {
+    const ws = document.getElementById('workspace');
+    const ph = ws.querySelector('.placeholder-msg');
+    if(ph) ph.remove();
+    
+    // Inject Resizer
+    const r = document.createElement('div');
+    r.className = 'resizer se';
+    el.appendChild(r);
+    initResizePhysics(el, r);
+
+    ws.appendChild(el);
+    selectComponent(el);
+}
+
+// /// 3. PHYSICS ENGINE (OMNI-DEVICE) ///
+
+// Helper to get coordinates regardless of input type
+function getPointerPos(e) {
+    if(e.touches && e.touches.length > 0) {
+        return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+    return { x: e.clientX, y: e.clientY };
+}
+
+function initDragPhysics(el) {
+    let isDragging = false;
+    let startX, startY, initialLeft, initialTop;
+
+    const startDrag = (e) => {
+        if(e.target.classList.contains('resizer')) return;
+        // On mobile, prevent scrolling while dragging
+        if(e.type === 'touchstart') document.body.style.overflow = 'hidden';
+        
+        isDragging = true;
+        const pos = getPointerPos(e);
+        startX = pos.x;
+        startY = pos.y;
+        initialLeft = el.offsetLeft;
+        initialTop = el.offsetTop;
+        el.style.cursor = 'grabbing';
+        
+        if(e.type === 'touchstart') {
+            window.addEventListener('touchmove', onDrag, {passive: false});
+            window.addEventListener('touchend', stopDrag);
         } else {
+            window.addEventListener('mousemove', onDrag);
+            window.addEventListener('mouseup', stopDrag);
+        }
+    };
+
+    const onDrag = (e) => {
+        if(!isDragging) return;
+        if(e.cancelable) e.preventDefault(); // Stop scroll
+        
+        const pos = getPointerPos(e);
+        const dx = pos.x - startX;
+        const dy = pos.y - startY;
+        el.style.left = `${initialLeft + dx}px`;
+        el.style.top = `${initialTop + dy}px`;
+    };
+
+    const stopDrag = () => {
+        isDragging = false;
+        el.style.cursor = 'grab';
+        document.body.style.overflow = ''; // Restore scroll
+        
+        window.removeEventListener('mousemove', onDrag);
+        window.removeEventListener('mouseup', stopDrag);
+        window.removeEventListener('touchmove', onDrag);
+        window.removeEventListener('touchend', stopDrag);
+    };
+
+    el.addEventListener('mousedown', startDrag);
+    el.addEventListener('touchstart', startDrag, {passive: false});
+}
+
+function initResizePhysics(el, resizer) {
+    const startResize = (e) => {
+        e.stopPropagation();
+        if(e.type === 'touchstart') document.body.style.overflow = 'hidden';
+        
+        const pos = getPointerPos(e);
+        const startX = pos.x;
+        const startY = pos.y;
+        const startW = parseInt(document.defaultView.getComputedStyle(el).width, 10);
+        const startH = parseInt(document.defaultView.getComputedStyle(el).height, 10);
+
+        const doResize = (evt) => {
+            if(evt.cancelable) evt.preventDefault();
+            const curr = getPointerPos(evt);
+            el.style.width = (startW + (curr.x - startX)) + 'px';
+            el.style.height = (startH + (curr.y - startY)) + 'px';
+        };
+
+        const stopResize = () => {
+            document.body.style.overflow = '';
             window.removeEventListener('mousemove', doResize);
             window.removeEventListener('mouseup', stopResize);
-        }
-    }
+            window.removeEventListener('touchmove', doResize);
+            window.removeEventListener('touchend', stopResize);
+        };
 
-    if(isTouch) {
-        window.addEventListener('touchmove', doResize, {passive: false});
-        window.addEventListener('touchend', stopResize);
-    } else {
-        window.addEventListener('mousemove', doResize);
-        window.addEventListener('mouseup', stopResize);
-    }
+        if(e.type === 'touchstart') {
+            window.addEventListener('touchmove', doResize, {passive: false});
+            window.addEventListener('touchend', stopResize);
+        } else {
+            window.addEventListener('mousemove', doResize);
+            window.addEventListener('mouseup', stopResize);
+        }
+    };
+
+    resizer.addEventListener('mousedown', startResize);
+    resizer.addEventListener('touchstart', startResize, {passive: false});
 }
 
-// /// 5. UTILS & UI ///
+// /// 4. UTILITIES ///
 
 function selectComponent(el) {
     if(selectedElement) selectedElement.classList.remove('selected');
     selectedElement = el;
     el.classList.add('selected');
-    
+    el.style.zIndex = zIndexCounter++;
+
     document.getElementById('no-selection').style.display = 'none';
     document.getElementById('editor-controls').style.display = 'block';
     
-    const txt = el.innerText;
-    document.getElementById('prop-text').value = txt;
+    // Populate props
+    if(el.childNodes[0] && el.childNodes[0].nodeType === 3) {
+         document.getElementById('prop-text').value = el.innerText;
+    } else {
+         document.getElementById('prop-text').value = "";
+    }
+    document.getElementById('prop-z').value = el.style.zIndex;
 
-    if(window.innerWidth <= 768) toggleSidebar('right');
+    // Mobile UX: Show properties, close tools
+    if(window.innerWidth <= 768) {
+        document.getElementById('sidebar-left').classList.remove('mobile-open');
+        document.getElementById('sidebar-right').classList.add('mobile-open');
+    }
 }
 
-function updateText(e) {
+function deselectAll() {
+    if(selectedElement) selectedElement.classList.remove('selected');
+    selectedElement = null;
+    document.getElementById('editor-controls').style.display = 'none';
+    document.getElementById('no-selection').style.display = 'block';
+}
+
+function updateProps(e) {
     if(!selectedElement) return;
-    const target = selectedElement.querySelector('h1, h2, p, span, button');
-    if(target) target.innerText = e.target.value;
+    const val = e.target.value;
+    const id = e.target.id;
+
+    if(id === 'prop-text') {
+        if(!selectedElement.querySelector('img') && !selectedElement.querySelector('video')) {
+           // Basic text update
+           selectedElement.innerText = val;
+           // Re-inject resizer after text wipe
+           const r = document.createElement('div');
+           r.className = 'resizer se';
+           selectedElement.appendChild(r);
+           initResizePhysics(selectedElement, r);
+        }
+    } else if(id === 'prop-color') {
+        selectedElement.style.backgroundColor = val;
+    } else if(id === 'prop-z') {
+        selectedElement.style.zIndex = val;
+    }
 }
-function updateColor(e) { if(selectedElement) selectedElement.style.backgroundColor = e.target.value; }
-function updatePadding(e) { if(selectedElement) selectedElement.style.padding = e.target.value + 'px'; }
 
 function deleteSelected() {
     if(selectedElement) {
         selectedElement.remove();
-        selectedElement = null;
-        document.getElementById('editor-controls').style.display = 'none';
-        document.getElementById('no-selection').style.display = 'block';
+        deselectAll();
     }
 }
 
-window.toggleSidebar = function(side) {
-    document.getElementById(`sidebar-${side}`).classList.toggle('mobile-open');
-};
-window.switchLeftTab = function(tab) {
-    document.querySelectorAll('.left-panel').forEach(p => p.classList.remove('active'));
-    document.getElementById(`panel-${tab}`).classList.add('active');
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    event.currentTarget.classList.add('active');
-};
-window.setDevice = function(mode) {
-    const ws = document.getElementById('workspace');
-    if(mode === 'mobile') {
-        ws.classList.add('mobile-mode');
-    } else {
-        ws.classList.remove('mobile-mode');
-    }
-};
-
-// /// 6. ANALYTICS ///
-
-function initAnalytics() {
-    const ctx = document.getElementById('trafficChart');
-    if(!ctx) return;
-    if(analyticsChart) analyticsChart.destroy();
-    analyticsChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
-            datasets: [{
-                label: 'VISITORS',
-                data: [12, 19, 3, 5, 2, 3, 10],
-                borderColor: '#00f3ff',
-                backgroundColor: 'rgba(0, 243, 255, 0.1)',
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { labels: { color: '#fff' } } },
-            scales: { x: { ticks: { color: '#666' } }, y: { ticks: { color: '#666' } } }
-        }
-    });
-}
-window.openAnalytics = () => document.getElementById('modal-analytics').style.display = 'flex';
-window.closeModal = (id) => document.getElementById(id).style.display = 'none';
-
-// /// 7. DEPLOYMENT & PAYMENT PROTOCOL ///
+// /// 5. DEPLOYMENT & PAYMENT ///
 
 window.deploySequence = function() {
-    // 1. Snapshot the Build
-    const currentBuild = document.getElementById('workspace').innerHTML;
-    if(!currentBuild || currentBuild.includes('TAP TOOLS')) {
-        alert("ERROR: WORKSPACE EMPTY. CONSTRUCT ARTIFACTS BEFORE DEPLOYMENT.");
+    const build = document.getElementById('workspace').innerHTML;
+    if(!build || build.includes('SPAWN')) {
+        alert("VOID DETECTED. SPAWN ARTIFACTS.");
         return;
     }
-
-    // 2. Save Telepathy Data
-    localStorage.setItem('nmv_pending_build', currentBuild);
-
-    // 3. Trigger Payment Interceptor
+    localStorage.setItem('nmv_pending_build', build);
     document.getElementById('payment-modal').style.display = 'flex';
 };
 
-window.closePayment = function() {
-    document.getElementById('payment-modal').style.display = 'none';
+window.closePayment = () => document.getElementById('payment-modal').style.display = 'none';
+window.processLicense = (code, url) => {
+    localStorage.setItem('nmv_active_license', code);
+    window.location.href = url;
 };
 
-window.processLicense = function(productCode, stripeUrl) {
-    // Tag the browser for the Success Page
-    localStorage.setItem('nmv_active_license', productCode);
-    
-    // Animate Selection
-    const cards = document.querySelectorAll('.product-card');
-    cards.forEach(c => c.style.opacity = '0.3');
-    
-    // Redirect to Payment
-    setTimeout(() => {
-        window.location.href = stripeUrl;
-    }, 500);
+window.togglePreview = () => {
+    // Basic preview toggle
+    document.body.classList.toggle('preview-active');
+    alert("PREVIEW MODE. CLICK AGAIN TO EDIT.");
+};
+
+window.toggleSidebar = (side) => {
+    document.getElementById(`sidebar-${side}`).classList.toggle('mobile-open');
 };
