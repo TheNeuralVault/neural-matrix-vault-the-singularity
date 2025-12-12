@@ -1,6 +1,7 @@
 /**
- * NEURAL CONSTRUCTOR v4.5 (TOUCH & MULTIVERSE EDITION)
+ * NEURAL CONSTRUCTOR v5.0 (TITANIUM EDITION)
  * ARCHITECT: MAGNUS OPUS
+ * PROTOCOLS: TOUCH PHYSICS, MULTIVERSE PAGES, PAYMENT INTERCEPT
  */
 
 // /// STATE MANAGEMENT ///
@@ -17,13 +18,15 @@ const MAX_IMAGES = 10;
 let analyticsChart = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("%c/// NEURAL PHYSICS: TOUCH ENABLED ///", "color:#00f3ff; background:#000;");
+    console.log("%c/// NEURAL PHYSICS: TOUCH ENABLED ///", "color:#00f3ff; background:#000; padding:5px;");
     
     // Load initial page state
     restorePageState('home');
     
     // Listeners
-    document.getElementById('media-upload-input').addEventListener('change', handleMediaUpload);
+    const mediaInput = document.getElementById('media-upload-input');
+    if(mediaInput) mediaInput.addEventListener('change', handleMediaUpload);
+    
     document.getElementById('prop-text').addEventListener('input', updateText);
     document.getElementById('prop-color').addEventListener('input', updateColor);
     document.getElementById('prop-padding').addEventListener('input', updatePadding);
@@ -48,13 +51,12 @@ window.switchPage = function(newPage) {
     // 3. LOAD New State
     currentPage = newPage;
     if (!pageStates[newPage] || pageStates[newPage].trim() === '') {
-        // If empty, default template
         workspace.innerHTML = '<div class="placeholder-msg">/// EMPTY SECTOR ///</div>';
     } else {
         workspace.innerHTML = pageStates[newPage];
     }
 
-    // 4. RE-INITIALIZE PHYSICS (Crucial: Re-bind listeners to new DOM elements)
+    // 4. RE-INITIALIZE PHYSICS
     rebindPhysics();
     
     // Close sidebar on mobile for better UX
@@ -62,14 +64,16 @@ window.switchPage = function(newPage) {
 };
 
 function rebindPhysics() {
-    // Re-attach click and resize listeners to all elements in the new page
     const elements = document.querySelectorAll('.element');
     elements.forEach(el => {
         el.addEventListener('click', (e) => { e.stopPropagation(); selectComponent(el); });
-        // Re-inject resizers if missing (sanity check)
         if(!el.querySelector('.resizer')) injectResizers(el);
         initResizeLogic(el);
     });
+}
+
+function restorePageState(page) {
+    pageStates[page] = document.getElementById('workspace').innerHTML;
 }
 
 // /// 2. MEDIA DOCK PROTOCOL (UPLOAD LIMIT 10) ///
@@ -89,14 +93,8 @@ function handleMediaUpload(e) {
     const reader = new FileReader();
     reader.onload = function(evt) {
         const base64 = evt.target.result;
-        
-        // Store
         uploadedImages.push(base64);
-        
-        // Render Thumbnail
         renderThumbnail(base64, uploadedImages.length - 1);
-        
-        // Update Count
         document.getElementById('media-count').innerText = uploadedImages.length;
     };
     reader.readAsDataURL(file);
@@ -108,14 +106,11 @@ function renderThumbnail(src, index) {
     thumb.className = 'media-thumb';
     thumb.style.backgroundImage = `url(${src})`;
     thumb.onclick = () => addImageToCanvas(src);
-    
-    // Insert before the "+" button
     grid.insertBefore(thumb, grid.lastElementChild);
 }
 
 function addImageToCanvas(src) {
     const workspace = document.getElementById('workspace');
-    // Remove placeholder
     const ph = workspace.querySelector('.placeholder-msg');
     if(ph) ph.remove();
 
@@ -126,10 +121,8 @@ function addImageToCanvas(src) {
     el.innerHTML = `<img src="${src}" style="width:100%; pointer-events:none;">`;
     
     injectResizers(el);
-    
     el.addEventListener('click', (e) => { e.stopPropagation(); selectComponent(el); });
     initResizeLogic(el);
-    
     workspace.appendChild(el);
     selectComponent(el);
     
@@ -157,10 +150,8 @@ window.addBlock = function(type) {
 
     el.innerHTML = html;
     injectResizers(el);
-    
     el.addEventListener('click', (e) => { e.stopPropagation(); selectComponent(el); });
-    initResizeLogic(el); // Attach Mouse & Touch logic
-
+    initResizeLogic(el);
     workspace.appendChild(el);
     selectComponent(el);
 
@@ -180,11 +171,8 @@ function injectResizers(el) {
 
 function initResizeLogic(el) {
     const resizers = el.querySelectorAll('.resizer');
-    
     resizers.forEach(resizer => {
-        // MOUSE
         resizer.addEventListener('mousedown', (e) => startResize(e, el, resizer, false));
-        // TOUCH
         resizer.addEventListener('touchstart', (e) => startResize(e, el, resizer, true), {passive: false});
     });
 }
@@ -207,7 +195,6 @@ function startResize(e, el, resizer, isTouch) {
             el.style.width = (startWidth + (clientX - startX)) + 'px';
             el.style.height = (startHeight + (clientY - startY)) + 'px';
         }
-        // Simplified for 'se' (Bottom Right) resizing for stability on mobile
     }
 
     function stopResize() {
@@ -239,17 +226,14 @@ function selectComponent(el) {
     document.getElementById('no-selection').style.display = 'none';
     document.getElementById('editor-controls').style.display = 'block';
     
-    // Populate Text Area if applicable
     const txt = el.innerText;
     document.getElementById('prop-text').value = txt;
 
-    // Mobile: Auto-open right sidebar
     if(window.innerWidth <= 768) toggleSidebar('right');
 }
 
 function updateText(e) {
     if(!selectedElement) return;
-    // Try to find a text node or header
     const target = selectedElement.querySelector('h1, h2, p, span, button');
     if(target) target.innerText = e.target.value;
 }
@@ -265,7 +249,6 @@ function deleteSelected() {
     }
 }
 
-// Navigation
 window.toggleSidebar = function(side) {
     document.getElementById(`sidebar-${side}`).classList.toggle('mobile-open');
 };
@@ -284,7 +267,8 @@ window.setDevice = function(mode) {
     }
 };
 
-// Analytics
+// /// 6. ANALYTICS ///
+
 function initAnalytics() {
     const ctx = document.getElementById('trafficChart');
     if(!ctx) return;
@@ -312,11 +296,37 @@ function initAnalytics() {
 window.openAnalytics = () => document.getElementById('modal-analytics').style.display = 'flex';
 window.closeModal = (id) => document.getElementById(id).style.display = 'none';
 
-window.exportSite = function() {
-    alert("COMPILING ASSETS... DEPLOYMENT QUEUED.");
+// /// 7. DEPLOYMENT & PAYMENT PROTOCOL ///
+
+window.deploySequence = function() {
+    // 1. Snapshot the Build
+    const currentBuild = document.getElementById('workspace').innerHTML;
+    if(!currentBuild || currentBuild.includes('TAP TOOLS')) {
+        alert("ERROR: WORKSPACE EMPTY. CONSTRUCT ARTIFACTS BEFORE DEPLOYMENT.");
+        return;
+    }
+
+    // 2. Save Telepathy Data
+    localStorage.setItem('nmv_pending_build', currentBuild);
+
+    // 3. Trigger Payment Interceptor
+    document.getElementById('payment-modal').style.display = 'flex';
 };
 
-// Initial Setup Helper
-function restorePageState(page) {
-    pageStates[page] = document.getElementById('workspace').innerHTML;
-                                }
+window.closePayment = function() {
+    document.getElementById('payment-modal').style.display = 'none';
+};
+
+window.processLicense = function(productCode, stripeUrl) {
+    // Tag the browser for the Success Page
+    localStorage.setItem('nmv_active_license', productCode);
+    
+    // Animate Selection
+    const cards = document.querySelectorAll('.product-card');
+    cards.forEach(c => c.style.opacity = '0.3');
+    
+    // Redirect to Payment
+    setTimeout(() => {
+        window.location.href = stripeUrl;
+    }, 500);
+};
