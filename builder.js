@@ -1,18 +1,24 @@
 /**
- * NEURAL CONSTRUCTOR v12.0 (POINTER EVENTS PROTOCOL)
+ * NEURAL CONSTRUCTOR v12.1 (MASTER EDITION)
  * ARCHITECT: MAGNUS OPUS
- * COMPATIBILITY: MOUSE, TOUCH, STYLUS (UNIVERSAL)
+ * PROTOCOLS: OMNI-PHYSICS, ACCURATE PRICING, DEPLOYMENT
  */
 
-// /// 1. DATABASE & STATE ///
+// /// 1. MASTER DATABASE ///
 const PRODUCT_CATALOG = {
+    // PILLARS
     core: { title: "THE NEURAL CORE", price: "$2,500.00", link: "https://buy.stripe.com/7sY7sL8dib6SbuvbPt8g001", mission: "Complete digital transformation...", tech: "Custom WebGL & Three.js..." },
     flux: { title: "FLUX VELOCITY", price: "$2,500.00", link: "https://buy.stripe.com/aFa3cv2SY3EqaqrcTx8g002", mission: "High-speed retail architecture...", tech: "Lightweight SPA & GSAP..." },
     aero: { title: "AERO PROTOCOL", price: "$2,500.00", link: "https://buy.stripe.com/bJe28r79e3Eq7efcTx8g003", mission: "Corporate precision...", tech: "Asymmetrical CSS Grid..." },
     nexus: { title: "NEXUS STREAM", price: "$2,500.00", link: "https://buy.stripe.com/3cIeVd2SY5My1TV4n18g00c", mission: "Mobile Command Center...", tech: "PWA & Real-time API..." },
     cipher: { title: "CIPHER PROTOCOL", price: "$2,500.00", link: "https://buy.stripe.com/3cIeVddxCdf04233iX8g00d", mission: "The Granite Wealth Architecture...", tech: "AES-256 & Ticker Integration..." },
     prism: { title: "PRISM SaaS", price: "$2,500.00", link: "https://buy.stripe.com/4gM8wP65afn8buv06L8g00e", mission: "Liquid Intelligence made manifest...", tech: "React/Vue Hybrid & D3.js..." },
-    omega: { title: "OMEGA REALITY", price: "$2,500.00", link: "https://buy.stripe.com/14A9AT79ea2OdCDf1F8g00f", mission: "Beyond the Screen...", tech: "Three.js & WebXR Integration..." }
+    omega: { title: "OMEGA REALITY", price: "$2,500.00", link: "https://buy.stripe.com/14A9AT79ea2OdCDf1F8g00f", mission: "Beyond the Screen...", tech: "Three.js & WebXR Integration..." },
+    
+    // SERVICES
+    signal: { title: "SIGNAL AMPLIFICATION", price: "$299.00 / mo", link: "https://buy.stripe.com/14AcN5alq2Am9mn8Dh8g005", mission: "AI-driven Semantic SEO...", tech: "Python Crawler & JSON-LD..." },
+    workflow: { title: "WORKFLOW AUTOMATA", price: "$750.00", link: "https://buy.stripe.com/9B65kD5163Eq7ef4n18g006", mission: "Code automation scripts...", tech: "Python 3.11+ & API Hooks..." },
+    fortress: { title: "DIGITAL FORTRESS", price: "$500.00", link: "https://buy.stripe.com/5kQ00jdxCdf0eGH6v98g00g", mission: "Security Sweep...", tech: "Anti-Right Click & CSP..." }
 };
 
 let selectedElement = null;
@@ -28,53 +34,37 @@ let pageStates = {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("%c/// NEURAL PHYSICS: POINTER EVENTS ACTIVE ///", "color:#00f3ff; background:#000; padding:5px;");
+    console.log("%c/// NEURAL PHYSICS: ACTIVE ///", "color:#00f3ff; background:#000; padding:5px;");
     
-    // Global Listeners
     const mediaInput = document.getElementById('media-upload-input');
     if(mediaInput) mediaInput.addEventListener('change', handleMediaUpload);
     
-    // Property Panel Listeners
-    const pText = document.getElementById('prop-text');
-    const pLink = document.getElementById('prop-link');
-    const pColor = document.getElementById('prop-color');
-    const pZ = document.getElementById('prop-z');
-
-    if(pText) pText.addEventListener('input', updateProps);
-    if(pLink) pLink.addEventListener('input', updateProps);
-    if(pColor) pColor.addEventListener('input', updateProps);
-    if(pZ) pZ.addEventListener('input', updateProps);
+    document.getElementById('prop-text').addEventListener('input', updateProps);
+    document.getElementById('prop-link').addEventListener('input', updateProps);
+    document.getElementById('prop-color').addEventListener('input', updateProps);
+    document.getElementById('prop-z').addEventListener('input', updateProps);
     
-    // Global Deselect (Pointer Event)
     const ws = document.getElementById('workspace');
     if(ws) ws.addEventListener('pointerdown', (e) => { 
         if(e.target.id === 'workspace') deselectAll(); 
     });
 
-    // Init
     restorePageState('home');
     loadSpec('core');
     initAnalytics();
 });
 
-// /// 2. OMNI-PHYSICS ENGINE (THE CORE) ///
+// /// 2. OMNI-PHYSICS ///
 
 function initPointerDrag(el) {
     let isDragging = false;
     let startX, startY, initialLeft, initialTop;
 
     el.addEventListener('pointerdown', (e) => {
-        // Ignore if clicking the resizer handle
         if(e.target.classList.contains('resizer')) return;
+        e.preventDefault(); e.stopPropagation();
         
-        // CRITICAL: Stop browser scrolling
-        e.preventDefault(); 
-        e.stopPropagation();
-        
-        // Select the element
         selectComponent(el);
-        
-        // Capture the pointer (keeps dragging even if mouse leaves div)
         el.setPointerCapture(e.pointerId);
         
         isDragging = true;
@@ -82,17 +72,14 @@ function initPointerDrag(el) {
         startY = e.clientY;
         initialLeft = el.offsetLeft;
         initialTop = el.offsetTop;
-        
         el.style.cursor = 'grabbing';
     });
 
     el.addEventListener('pointermove', (e) => {
         if(!isDragging) return;
-        e.preventDefault(); // Stop scroll
-        
+        e.preventDefault();
         const dx = e.clientX - startX;
         const dy = e.clientY - startY;
-        
         el.style.left = `${initialLeft + dx}px`;
         el.style.top = `${initialTop + dy}px`;
     });
@@ -110,10 +97,8 @@ function initPointerResize(el, resizer) {
     let startX, startY, startW, startH;
 
     resizer.addEventListener('pointerdown', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+        e.preventDefault(); e.stopPropagation();
         resizer.setPointerCapture(e.pointerId);
-        
         isResizing = true;
         startX = e.clientX;
         startY = e.clientY;
@@ -124,11 +109,8 @@ function initPointerResize(el, resizer) {
     resizer.addEventListener('pointermove', (e) => {
         if(!isResizing) return;
         e.preventDefault();
-        
         const width = startW + (e.clientX - startX);
         const height = startH + (e.clientY - startY);
-        
-        // Minimum size check
         if(width > 20) el.style.width = `${width}px`;
         if(height > 20) el.style.height = `${height}px`;
     });
@@ -144,20 +126,13 @@ function initPointerResize(el, resizer) {
 function createBaseElement() {
     const el = document.createElement('div');
     el.className = 'element';
-    
-    // Spawn in visual center relative to scroll
-    // On mobile, this ensures it appears where they are looking
-    const ws = document.getElementById('workspace');
-    el.style.left = '50px'; 
-    el.style.top = '50px';
+    const viewportX = window.innerWidth;
+    const viewportY = window.innerHeight;
+    el.style.left = (viewportX / 2 - 100) + 'px';
+    el.style.top = (viewportY / 2 - 50) + 'px';
     el.style.zIndex = zIndexCounter++;
-    
-    // CRITICAL: DISABLE BROWSER GESTURES ON THE ELEMENT
     el.style.touchAction = "none"; 
-    
-    // Attach Physics
     initPointerDrag(el);
-    
     return el;
 }
 
@@ -165,22 +140,17 @@ function addToWorkspace(el) {
     const ws = document.getElementById('workspace');
     const ph = ws.querySelector('.placeholder-msg');
     if(ph) ph.remove();
-    
-    // Inject Resizer
     const r = document.createElement('div');
     r.className = 'resizer se';
     el.appendChild(r);
     initPointerResize(el, r);
-
     ws.appendChild(el);
     selectComponent(el);
 }
 
-// Spawners
 window.spawnMedia = function(src, type) {
     const el = createBaseElement();
     if(type === 'video') {
-        // Pointer events auto needed for video controls, but none for drag wrapper
         el.innerHTML = `<video src="${src}" controls style="width:100%; height:100%; object-fit:cover; pointer-events:auto;"></video>`;
         el.style.width = '300px'; el.style.height = '200px';
     } else {
@@ -215,8 +185,6 @@ window.spawnBlock = function(type) {
     closeMobileSidebar();
 };
 
-// /// 4. MEDIA UPLOAD ///
-
 window.triggerMediaUpload = function() { document.getElementById('media-upload-input').click(); };
 
 function handleMediaUpload(e) {
@@ -244,13 +212,12 @@ function renderThumbnail(src, type) {
     } else {
         thumb.style.backgroundImage = `url(${src})`;
     }
-    // Prevent default click, use spawn
     thumb.onclick = (e) => { e.preventDefault(); spawnMedia(src, type); };
     grid.insertBefore(thumb, grid.firstElementChild);
     if(window.lucide) lucide.createIcons();
 }
 
-// /// 5. UTILITIES & UI ///
+// /// 4. UTILITIES ///
 
 function selectComponent(el) {
     if(selectedElement) selectedElement.classList.remove('selected');
@@ -261,7 +228,6 @@ function selectComponent(el) {
     document.getElementById('no-selection').style.display = 'none';
     document.getElementById('editor-controls').style.display = 'block';
     
-    // Update Props Panel
     const pText = document.getElementById('prop-text');
     const pLink = document.getElementById('prop-link');
     const pZ = document.getElementById('prop-z');
@@ -301,25 +267,27 @@ function updateProps(e) {
     } else if(id === 'prop-z') selectedElement.style.zIndex = val;
 }
 
-function deleteSelected() { 
-    if(selectedElement) { selectedElement.remove(); deselectAll(); } 
-}
+function deleteSelected() { if(selectedElement) { selectedElement.remove(); deselectAll(); } }
 
-// /// 6. PAGE MANAGEMENT ///
+// /// 5. UI & DEPLOYMENT ///
 
 window.switchPage = function(newPage) {
     if (currentPage === newPage) return;
-    // Save
     pageStates[currentPage] = document.getElementById('workspace').innerHTML;
-    // UI
     document.querySelectorAll('.page-item').forEach(p => p.classList.remove('active'));
     event.currentTarget.classList.add('active');
     document.getElementById('current-page-label').innerText = newPage.toUpperCase();
-    // Load
     currentPage = newPage;
-    document.getElementById('workspace').innerHTML = (!pageStates[newPage] || pageStates[newPage].trim() === '') ? '<div class="placeholder-msg">/// EMPTY SECTOR ///</div>' : pageStates[newPage];
-    // Rebind Physics to new elements
-    rebindPhysics();
+    document.getElementById('workspace').innerHTML = (!pageStates[newPage] || pageStates[newPage].trim() === '') ? '<div class="placeholder-msg">/// CLICK TOOLS TO SPAWN ///</div>' : pageStates[newPage];
+    // Rebind Physics
+    const elements = document.querySelectorAll('.element');
+    elements.forEach(el => {
+        el.style.touchAction = "none";
+        initPointerDrag(el);
+        const r = el.querySelector('.resizer');
+        if(r) initPointerResize(el, r);
+        el.addEventListener('pointerdown', (e) => { if(!e.target.classList.contains('resizer')) { e.stopPropagation(); selectComponent(el); } });
+    });
     if(window.innerWidth <= 768) closeMobileSidebar();
 };
 
@@ -327,26 +295,11 @@ function restorePageState(page) {
     pageStates[page] = document.getElementById('workspace').innerHTML;
 }
 
-function rebindPhysics() {
-    const elements = document.querySelectorAll('.element');
-    elements.forEach(el => {
-        // Re-inject physics
-        initPointerDrag(el);
-        el.style.touchAction = "none"; // Ensure flag is set
-        el.addEventListener('pointerdown', (e) => {
-            if(!e.target.classList.contains('resizer')) { e.stopPropagation(); selectComponent(el); }
-        });
-        const r = el.querySelector('.resizer');
-        if(r) initPointerResize(el, r);
-    });
-}
-
-// /// 7. DEPLOYMENT & MODALS ///
-
 window.deploySequence = function() {
     const build = document.getElementById('workspace').innerHTML;
     localStorage.setItem('nmv_pending_build', build);
     document.getElementById('payment-modal').style.display = 'flex';
+    loadSpec('core');
 };
 
 window.closePayment = () => document.getElementById('payment-modal').style.display = 'none';
@@ -357,6 +310,13 @@ window.processLicense = (code, url) => {
 };
 
 // UI Toggles
+window.switchLeftTab = function(tab) {
+    document.querySelectorAll('.left-panel').forEach(p => p.style.display = 'none');
+    document.getElementById(`panel-${tab}`).style.display = 'block';
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+};
+
 window.toggleSidebar = function(side) { document.getElementById(`sidebar-${side}`).classList.toggle('mobile-open'); };
 function closeMobileSidebar() { if(window.innerWidth <= 768) document.getElementById('sidebar-left').classList.remove('mobile-open'); }
 window.togglePreview = () => document.body.classList.toggle('preview-active');
@@ -366,6 +326,10 @@ window.loadSpec = function(id) {
     const data = PRODUCT_CATALOG[id] || PRODUCT_CATALOG['core'];
     const container = document.getElementById('spec-container');
     document.querySelectorAll('.arch-btn').forEach(btn => btn.classList.remove('active'));
+    // Highlight button based on text match (simplified)
+    const btns = document.querySelectorAll('.arch-btn');
+    for(let b of btns) { if(b.getAttribute('onclick').includes(id)) b.classList.add('active'); }
+
     if(container) {
         container.innerHTML = `
             <div class="spec-header"><h2 class="spec-title">${data.title}</h2><div class="spec-price">${data.price}</div></div>
