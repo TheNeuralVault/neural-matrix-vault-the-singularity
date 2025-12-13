@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEURAL CONSTRUCTOR | v11.0</title>
+    <title>NEURAL CONSTRUCTOR | v12.0</title>
     
-    <!-- /// GOOGLE TAG /// -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-P1PCVNCCE4"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -14,160 +13,86 @@
       gtag('config', 'G-P1PCVNCCE4');
     </script>
 
-    <!-- /// ASSETS /// -->
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;500;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- /// TITANIUM SKIN /// -->
     <style>
-        :root {
-            --bg-void: #020202;
-            --bg-panel: rgba(10, 10, 10, 0.95);
-            --border: #333;
-            --accent: #00f3ff;
-            --accent-dim: rgba(0, 243, 255, 0.1);
-            --font-head: 'Outfit', sans-serif;
-            --font-mono: 'Space Mono', monospace;
-        }
-
-        body { margin: 0; background: var(--bg-void); color: #fff; font-family: var(--font-head); overflow: hidden; touch-action: none; }
+        :root { --bg-void: #020202; --bg-panel: rgba(10, 10, 10, 0.95); --border: #333; --accent: #00f3ff; }
+        body { margin: 0; background: var(--bg-void); color: #fff; font-family: 'Outfit', sans-serif; overflow: hidden; touch-action: none; }
         * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
-
-        /* SCROLLBARS */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #000; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: #000; } ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 
         .interface-wrapper { display: flex; height: 100vh; width: 100%; position: relative; }
 
         /* MOBILE NAV */
-        .mobile-nav { 
-            display: none; height: 60px; background: #000; border-bottom: 1px solid var(--border);
-            justify-content: space-between; align-items: center; padding: 0 20px;
-            position: fixed; top: 0; left: 0; width: 100%; z-index: 6000;
-        }
+        .mobile-nav { display: none; height: 60px; background: #000; border-bottom: 1px solid var(--border); justify-content: space-between; align-items: center; padding: 0 20px; position: fixed; top: 0; left: 0; width: 100%; z-index: 6000; }
         .mobile-nav button { background: none; border: none; color: #fff; display: flex; gap: 5px; align-items: center; cursor: pointer; }
-        .brand-mobile { font-family: var(--font-mono); color: var(--accent); font-weight: bold; letter-spacing: 2px; }
+        .brand-mobile { font-family: 'Space Mono'; color: var(--accent); font-weight: bold; letter-spacing: 2px; }
 
         /* SIDEBARS */
-        .sidebar-left, .sidebar-right { 
-            width: 320px; background: var(--bg-panel); border-right: 1px solid var(--border); 
-            display: flex; flex-direction: column; z-index: 5000; 
-            backdrop-filter: blur(10px); transition: transform 0.3s ease;
-        }
+        .sidebar-left, .sidebar-right { width: 320px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 5000; backdrop-filter: blur(10px); transition: transform 0.3s ease; }
         .sidebar-right { border-left: 1px solid var(--border); border-right: none; }
-
-        .brand { 
-            padding: 25px; font-family: var(--font-mono); font-weight: 700; 
-            border-bottom: 1px solid var(--border); letter-spacing: 1px;
-            background: linear-gradient(90deg, rgba(0,243,255,0.05), transparent);
-            color: var(--accent);
-        }
+        .brand { padding: 25px; font-family: 'Space Mono'; font-weight: 700; border-bottom: 1px solid var(--border); color: var(--accent); }
 
         /* TABS */
         .tab-triggers { display: flex; border-bottom: 1px solid var(--border); }
-        .tab-btn { 
-            flex: 1; padding: 15px; background: none; border: none; color: #666; 
-            cursor: pointer; font-family: var(--font-mono); font-size: 0.7rem; 
-            transition: 0.3s; border-bottom: 2px solid transparent;
-        }
-        .tab-btn:hover { color: #fff; }
-        .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); background: var(--accent-dim); }
+        .tab-btn { flex: 1; padding: 15px; background: none; border: none; color: #666; cursor: pointer; font-family: 'Space Mono'; font-size: 0.7rem; }
+        .tab-btn.active { color: var(--accent); border-bottom: 2px solid var(--accent); background: rgba(0,243,255,0.05); }
 
         /* PANELS */
         .left-panel { padding: 20px; display: none; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
-        .left-panel.active { display: block; }
+        .tool-category { font-size: 0.6rem; color: #666; margin: 25px 0 10px 0; font-family: 'Space Mono'; font-weight: bold; }
+        .draggable-item { padding: 15px; border: 1px solid var(--border); margin-bottom: 10px; background: rgba(255,255,255,0.03); border-radius: 4px; cursor: pointer; display: flex; gap: 10px; align-items: center; font-size: 0.75rem; font-family: 'Space Mono'; }
+        .draggable-item:hover { border-color: var(--accent); color: var(--accent); }
         
-        .tool-category { font-size: 0.6rem; color: #666; margin: 25px 0 10px 0; font-family: var(--font-mono); font-weight: bold; text-transform: uppercase; }
+        .page-item { padding: 15px; border: 1px solid var(--border); margin-bottom: 10px; cursor: pointer; font-family: 'Space Mono'; font-size: 0.8rem; display: flex; align-items: center; gap: 10px; }
+        .page-item.active { background: rgba(0,243,255,0.1); border-color: var(--accent); color: var(--accent); }
 
-        .draggable-item { 
-            padding: 15px; border: 1px solid var(--border); margin-bottom: 10px; background: rgba(255,255,255,0.03); 
-            border-radius: 4px; cursor: pointer; display: flex; gap: 10px; align-items: center; 
-            font-size: 0.75rem; font-family: var(--font-mono); transition: 0.2s;
-        }
-        .draggable-item:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
-
-        /* PAGE LIST */
-        .page-item { padding: 15px; border: 1px solid var(--border); margin-bottom: 10px; cursor: pointer; font-family: var(--font-mono); font-size: 0.8rem; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
-        .page-item:hover { border-color: #fff; }
-        .page-item.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
-
-        /* MEDIA DOCK */
         .media-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 20px; }
-        .media-thumb { 
-            width: 100%; aspect-ratio: 1; background: #000; border: 1px solid #333; 
-            background-size: cover; background-position: center; cursor: pointer; 
-            transition: 0.2s; position: relative;
-        }
-        .media-thumb:hover { border-color: var(--accent); }
+        .media-thumb { width: 100%; aspect-ratio: 1; background: #000; border: 1px solid #333; background-size: cover; cursor: pointer; }
 
         /* CANVAS */
-        .canvas-area { 
-            flex: 1; background: #050505; display: flex; flex-direction: column; 
-            background-image: linear-gradient(#111 1px, transparent 1px), linear-gradient(90deg, #111 1px, transparent 1px);
-            background-size: 40px 40px;
-            position: relative; overflow: hidden; z-index: 1;
-        }
-        .canvas-header { 
-            height: 60px; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.8); 
-            display: flex; justify-content: space-between; align-items: center; padding: 0 20px; z-index: 90;
-        }
-        .current-view { font-family: var(--font-mono); font-size: 0.75rem; color: #888; }
-
+        .canvas-area { flex: 1; background: #050505; display: flex; flex-direction: column; background-image: linear-gradient(#111 1px, transparent 1px), linear-gradient(90deg, #111 1px, transparent 1px); background-size: 40px 40px; position: relative; overflow: hidden; z-index: 1; }
+        .canvas-header { height: 60px; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.8); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; z-index: 90; }
         .drop-zone { flex: 1; background: transparent; overflow: hidden; position: relative; width: 100%; height: 100%; touch-action: none; }
-        .placeholder-msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #333; font-family: var(--font-mono); pointer-events: none; border: 1px dashed #333; padding: 20px; }
+        .placeholder-msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #333; font-family: 'Space Mono'; pointer-events: none; border: 1px dashed #333; padding: 20px; }
 
-        /* ELEMENTS */
-        .element { position: absolute; min-width: 50px; min-height: 50px; transition: box-shadow 0.1s; user-select: none; touch-action: none; }
+        .element { position: absolute; min-width: 50px; min-height: 50px; user-select: none; touch-action: none; }
         .element:hover { outline: 1px dashed rgba(0,243,255,0.3); cursor: grab; }
         .element.selected { outline: 2px solid var(--accent); z-index: 1000 !important; cursor: grabbing; }
         .element img, .element video { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
         .element a { color: inherit; text-decoration: none; pointer-events: none; }
 
-        /* PROPERTIES */
         .properties-panel { padding: 25px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
-        .input-titanium { width: 100%; background: #080808; border: 1px solid var(--border); color: #fff; padding: 12px; font-family: var(--font-mono); margin-top: 5px; outline: none; border-radius: 4px; }
-        .btn-upload { width: 100%; background: #222; border: 1px dashed #666; color: #fff; padding: 15px; cursor: pointer; margin-bottom: 10px; display: flex; justify-content: center; gap: 10px; font-family: var(--font-mono); font-size: 0.75rem; transition: 0.2s; }
+        .input-titanium { width: 100%; background: #080808; border: 1px solid var(--border); color: #fff; padding: 12px; font-family: 'Space Mono'; margin-top: 5px; outline: none; border-radius: 4px; }
+        .btn-upload { width: 100%; background: #222; border: 1px dashed #666; color: #fff; padding: 15px; cursor: pointer; margin-bottom: 10px; font-family: 'Space Mono'; font-size: 0.75rem; }
 
-        /* RESIZERS */
         .resizer { position: absolute; width: 30px; height: 30px; background: var(--accent); z-index: 1001; display: none; border: 2px solid #000; border-radius: 50%; }
         .element.selected .resizer { display: block; }
         .resizer.se { bottom: -15px; right: -15px; cursor: se-resize; }
 
-        /* UTILS */
-        .sys-btn { flex: 1; background: #111; border: 1px solid var(--border); color: #888; padding: 10px; border-radius: 4px; cursor: pointer; font-family: var(--font-mono); font-size: 0.8rem;}
+        .sys-btn { flex: 1; background: #111; border: 1px solid var(--border); color: #888; padding: 10px; border-radius: 4px; cursor: pointer; font-family: 'Space Mono'; font-size: 0.8rem;}
         .sys-btn.primary { background: var(--accent); color: #000; border: none; font-weight: bold; }
-        
+
         /* MODALS */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2147483647; display: none; justify-content: center; align-items: center; }
         .modal-box { width: 95%; max-width: 1000px; height: 80vh; background: #050505; border: 1px solid var(--border); display: flex; overflow: hidden; box-shadow: 0 0 50px rgba(0,243,255,0.1); position: relative; }
         .modal-sidebar { width: 300px; background: #0a0a0a; border-right: 1px solid var(--border); padding: 20px; overflow-y: auto; }
-        .arch-btn { width: 100%; padding: 15px; text-align: left; background: #111; border: 1px solid #333; color: #888; margin-bottom: 10px; cursor: pointer; font-family: 'Space Mono'; transition: 0.3s; }
-        .arch-btn:hover { border-color: var(--accent); color: #fff; }
+        .arch-btn { width: 100%; padding: 15px; text-align: left; background: #111; border: 1px solid #333; color: #888; margin-bottom: 10px; cursor: pointer; font-family: 'Space Mono'; }
         .arch-btn.active { background: var(--accent); color: #000; font-weight: bold; border-color: var(--accent); }
         .modal-content { flex: 1; padding: 40px; overflow-y: auto; position: relative; }
         .spec-header { border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 20px; }
         .spec-title { font-size: 2rem; color: #fff; font-weight: 800; margin: 0; }
         .spec-price { color: var(--accent); font-family: 'Space Mono'; font-size: 1.2rem; margin-top: 10px; }
         .spec-section { margin-bottom: 30px; }
-        .spec-label { font-family: 'Space Mono'; color: #666; font-size: 0.8rem; border-bottom: 1px solid #333; margin-bottom: 10px; padding-bottom: 5px; display: inline-block; }
+        .spec-label { font-family: 'Space Mono'; color: #666; font-size: 0.8rem; border-bottom: 1px solid #333; margin-bottom: 10px; display: inline-block; }
         .spec-text { color: #ccc; font-size: 0.9rem; line-height: 1.6; }
         .spec-actions { margin-top: 40px; }
 
-        /* PREVIEW MODE */
-        #exit-preview-btn {
-            position: fixed; bottom: 30px; right: 30px; z-index: 2147483647;
-            background: #ff0055; color: #fff; border: none; padding: 15px 30px;
-            font-weight: bold; font-family: 'Space Mono'; display: none; cursor: pointer;
-            box-shadow: 0 0 20px rgba(255,0,85,0.5);
-        }
-        body.preview-active .sidebar-left, 
-        body.preview-active .sidebar-right, 
-        body.preview-active .mobile-nav, 
-        body.preview-active .canvas-header { display: none !important; }
-        body.preview-active .element { outline: none !important; }
-        body.preview-active .resizer { display: none !important; }
+        #exit-preview-btn { position: fixed; bottom: 30px; right: 30px; z-index: 2147483647; background: #ff0055; color: #fff; border: none; padding: 15px 30px; font-weight: bold; font-family: 'Space Mono'; display: none; cursor: pointer; }
+        body.preview-active .sidebar-left, body.preview-active .sidebar-right, body.preview-active .mobile-nav, body.preview-active .canvas-header { display: none !important; }
+        body.preview-active .element { outline: none !important; } body.preview-active .resizer { display: none !important; }
         body.preview-active .element a { pointer-events: auto !important; }
         body.preview-active #exit-preview-btn { display: block; }
         body.preview-active #workspace { width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; background: #000; z-index: 9999; }
@@ -175,11 +100,7 @@
         @media(max-width: 768px) { 
             .interface-wrapper { flex-direction: column; padding-top: 60px; } 
             .mobile-nav { display: flex; }
-            .sidebar-left, .sidebar-right { 
-                display: flex; position: fixed; top: 60px; bottom: 0; width: 85%; max-width: none;
-                background: #0a0a0a; z-index: 5500; transform: translateX(-100%); 
-                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            }
+            .sidebar-left, .sidebar-right { display: flex; position: fixed; top: 60px; bottom: 0; width: 85%; max-width: none; background: #0a0a0a; z-index: 5500; transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
             .sidebar-right { right: 0; transform: translateX(100%); border-left: 1px solid #333; border-right: none; }
             .mobile-open { transform: translateX(0) !important; }
             .canvas-header { display: none; }
@@ -190,32 +111,25 @@
 </head>
 <body>
 
-<!-- UPLOAD CONDUIT -->
 <input type="file" id="media-upload-input" hidden accept="image/*,video/*" multiple>
-
-<!-- EXIT PREVIEW BUTTON -->
 <button id="exit-preview-btn" onclick="togglePreview()">EXIT PREVIEW</button>
 
 <div class="interface-wrapper">
-    <!-- MOBILE NAV -->
     <div class="mobile-nav">
         <button onclick="toggleSidebar('left')"><i data-lucide="menu"></i> TOOLS</button>
         <div class="brand-mobile">NMV_BUILDER</div>
         <button onclick="toggleSidebar('right')"><i data-lucide="settings-2"></i> EDIT</button>
     </div>
 
-    <!-- LEFT -->
     <aside class="sidebar-left" id="sidebar-left">
         <div class="brand">NMV_ARCHITECT</div>
         
-        <!-- TABS REINSTATED -->
         <div class="tab-triggers">
             <button class="tab-btn active" onclick="switchLeftTab('tools')">TOOLS</button>
             <button class="tab-btn" onclick="switchLeftTab('pages')">PAGES</button>
         </div>
 
-        <!-- PANEL: TOOLS -->
-        <div id="panel-tools" class="left-panel active">
+        <div id="panel-tools" class="left-panel" style="display:block;">
             <div class="tool-category" style="margin-top:0;">MEDIA VAULT</div>
             <button class="btn-upload" onclick="triggerMediaUpload()"><i data-lucide="upload-cloud"></i> UPLOAD</button>
             <div class="media-grid" id="media-grid"></div>
@@ -227,7 +141,6 @@
             <div class="draggable-item" onclick="spawnBlock('hero')"><i data-lucide="monitor"></i> HERO SECTION</div>
         </div>
 
-        <!-- PANEL: PAGES REINSTATED -->
         <div id="panel-pages" class="left-panel" style="display:none;">
             <div class="tool-category" style="margin-top:0;">SITE STRUCTURE</div>
             <div class="page-item active" onclick="switchPage('home')"><i data-lucide="home"></i> HOME</div>
@@ -237,7 +150,6 @@
         </div>
     </aside>
 
-    <!-- CENTER -->
     <main class="canvas-area">
         <div class="canvas-header">
             <div class="current-view">PAGE: <span id="current-page-label" style="color:var(--accent);">HOME</span></div>
@@ -248,7 +160,6 @@
         </div>
     </main>
 
-    <!-- RIGHT -->
     <aside class="sidebar-right" id="sidebar-right">
         <div style="padding:20px; border-bottom:1px solid #333;">
             <button class="sys-btn primary" onclick="deploySequence()" style="width:100%;">DEPLOY SITE</button>
@@ -260,23 +171,19 @@
             <div id="editor-controls" style="display:none;">
                 <label class="tool-category">CONTENT</label>
                 <textarea id="prop-text" class="input-titanium" rows="3"></textarea>
-                
                 <label class="tool-category" style="margin-top:20px;">LINK URL (HTTPS://)</label>
                 <input type="text" id="prop-link" class="input-titanium" placeholder="https://...">
-
                 <label class="tool-category" style="margin-top:20px;">BACKGROUND</label>
                 <input type="color" id="prop-color" style="width:100%; height:40px; background:none; border:1px solid #333;">
-                
                 <label class="tool-category" style="margin-top:20px;">Z-INDEX</label>
                 <input type="number" id="prop-z" class="input-titanium" value="1">
-                
                 <button class="btn-upload" style="margin-top:30px; border-color:red; color:red;" onclick="deleteSelected()">INCINERATE</button>
             </div>
         </div>
     </aside>
 </div>
 
-<!-- /// ANALYTICS MODAL /// -->
+<!-- ANALYTICS MODAL -->
 <div id="modal-analytics" class="modal-overlay">
     <div class="modal-box" style="flex-direction:column; align-items:center; justify-content:center; max-width:600px; height:auto;">
         <h3 style="font-family:'Space Mono'; margin-bottom:20px; color:#fff;">TRAFFIC_FLUX</h3>
@@ -285,12 +192,10 @@
     </div>
 </div>
 
-<!-- /// PAYMENT SPECIFICATION MODAL /// -->
+<!-- PAYMENT MODAL -->
 <div id="payment-modal" class="modal-overlay">
     <div class="modal-box">
         <button onclick="closePayment()" style="position:absolute; top:20px; right:20px; z-index:99; background:none; border:none; color:#666; font-size:1.5rem; cursor:pointer;">&times;</button>
-        
-        <!-- SIDEBAR SELECTOR -->
         <div class="modal-sidebar">
             <div class="tool-category">IDENTIFY ARCHITECTURE</div>
             <div class="arch-btn active" onclick="loadSpec('core')">NEURAL CORE</div>
@@ -301,15 +206,11 @@
             <div class="arch-btn" onclick="loadSpec('prism')">PRISM SaaS</div>
             <div class="arch-btn" onclick="loadSpec('omega')">OMEGA REALITY</div>
         </div>
-
-        <!-- SPEC SHEET -->
-        <div class="modal-content" id="spec-container">
-            <!-- INJECTED BY JS -->
-        </div>
+        <div class="modal-content" id="spec-container"></div>
     </div>
 </div>
 
 <script src="builder.js"></script>
 <script>lucide.createIcons();</script>
 </body>
-</html>
+    </html>
